@@ -130,6 +130,13 @@
 			<artifactId>commons-validator</artifactId>
 			<version>1.10.1</version>
 		</dependency>
+		
+		<!-- Adiciona a dependência do JasperReports -->
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports-pdf</artifactId>
+			<version>7.0.6</version>
+		</dependency>
 
 	</dependencies>
 
