@@ -1,4 +1,4 @@
-package web.lance_bovino;
+package com.example.lance_bovino;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
