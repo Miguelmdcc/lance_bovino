@@ -25,6 +25,9 @@ public class User implements Serializable {
 	private Long codigo;
 	private String nome;
 	private String cpf;
+	@Column(name = "metodo_bancario")
+	@Enumerated(EnumType.STRING)
+	private BankMethod metodo_bancario;
 	@Column(name = "dados_bancarios")
 	private Long dadosBancarios;
 	@Enumerated(EnumType.STRING)
