@@ -2,11 +2,11 @@ package com.example.repository.queries.usuario;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import web.controlevacinacao.filter.PessoaFilter;
-import web.controlevacinacao.model.Pessoa;
+import com.example.filter.UsuarioFilter;
+import com.example.model.User;
 
 public interface UsuarioQueries {
 
-	Page<Pessoa> pesquisar(GadoFilter filtro, Pageable pageable);
+	Page<User> pesquisar(UsuarioFilter filtro, Pageable pageable);
 	
 }

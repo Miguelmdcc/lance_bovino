@@ -51,6 +51,12 @@ public class User implements Serializable {
 	public void setCpf(String cpf) {
 		this.cpf = cpf;
 	}
+	public BankMethod getMetodo_bancario() {
+		return metodo_bancario;
+	}
+	public void setMetodo_bancario(BankMethod metodo_bancario) {
+		this.metodo_bancario = metodo_bancario;
+	}
 	public Long getDadosBancarios() {
 		return dadosBancarios;
 	}
@@ -66,7 +72,8 @@ public class User implements Serializable {
 
 	@Override
 	public String toString() {
-		return "User [codigo=" + codigo + ", nome=" + nome + ", cpf=" + cpf + ", dadosBancarios="
-				+ dadosBancarios + ", status=" + status + "]";
+		return "User [codigo=" + codigo + ", nome=" + nome + ", cpf=" + cpf + ", metodo_bancario=" + metodo_bancario
+				+ ", dadosBancarios=" + dadosBancarios + ", status=" + status + "]";
 	}
+	
 }

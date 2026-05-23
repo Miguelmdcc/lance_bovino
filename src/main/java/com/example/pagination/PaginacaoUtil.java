@@ -1,4 +1,4 @@
-package web.controlevacinacao.pagination;
+package com.example.pagination;
 
 import java.util.ArrayList;
 import java.util.List;

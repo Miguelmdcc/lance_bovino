@@ -12,74 +12,74 @@ import org.springframework.util.StringUtils;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
-import web.controlevacinacao.filter.PessoaFilter;
-import web.controlevacinacao.model.Pessoa;
-import web.controlevacinacao.pagination.PaginacaoUtil;
+import com.example.filter.UsuarioFilter;
+import com.example.model.User;
+import com.example.pagination.PaginacaoUtil;
 
 public class UsuarioQueriesImpl implements UsuarioQueries {
 
 	@PersistenceContext
 	private EntityManager em;
 
-   	public Page<Pessoa> pesquisar(GadoFilter filtro, Pageable pageable) {
+   	public Page<User> pesquisar(UsuarioFilter filtro, Pageable pageable) {
 
-		StringBuilder queryPessoas = new StringBuilder("select distinct p from Pessoa p");
+		StringBuilder queryUsuarios = new StringBuilder("select distinct u from User u");
 		StringBuilder condicoes = new StringBuilder();
 		Map<String, Object> parametros = new HashMap<>();
 
 		preencherCondicoesEParametros(filtro, condicoes, parametros);
 
 		if (condicoes.isEmpty()) {
-			condicoes.append(" where p.status = 'ATIVO'");
+			condicoes.append(" where u.status = 'ATIVO'");
 		} else {
-			condicoes.append(" and p.status = 'ATIVO'");
+			condicoes.append(" and u.status = 'ATIVO'");
 		}
 
-		queryPessoas.append(condicoes);
-		PaginacaoUtil.prepararOrdemJPQL(queryPessoas, "p", pageable);
-		TypedQuery<Pessoa> typedQuery = em.createQuery(queryPessoas.toString(), Pessoa.class);
+		queryUsuarios.append(condicoes);
+		PaginacaoUtil.prepararOrdemJPQL(queryUsuarios, "u", pageable);
+		TypedQuery<User> typedQuery = em.createQuery(queryUsuarios.toString(), User.class);
 		PaginacaoUtil.prepararIntervalo(typedQuery, pageable);
 		PaginacaoUtil.preencherParametros(parametros, typedQuery);
-		List<Pessoa> vacinas = typedQuery.getResultList();
+		List<User> usuarios = typedQuery.getResultList();
 
-		long totalPessoas = PaginacaoUtil.getTotalRegistros("Pessoa", "p", condicoes, parametros, em);
+		long totalUsuarios = PaginacaoUtil.getTotalRegistros("User", "u", condicoes, parametros, em);
 
-		return new PageImpl<>(vacinas, pageable, totalPessoas);
+		return new PageImpl<>(usuarios, pageable, totalUsuarios);
 	}
 
-	private void preencherCondicoesEParametros(GadoFilter filtro, StringBuilder condicoes, Map<String, Object> parametros) {
+	private void preencherCondicoesEParametros(UsuarioFilter filtro, StringBuilder condicoes, Map<String, Object> parametros) {
 		boolean condicao = false;
 
 		if (filtro.getCodigo() != null) {
 			PaginacaoUtil.fazerLigacaoCondicoes(condicoes, condicao);
-			condicoes.append("p.codigo = :codigo");
+			condicoes.append("u.codigo = :codigo");
 			parametros.put("codigo", filtro.getCodigo());
 			condicao = true;
 		}
 		if (StringUtils.hasText(filtro.getNome())) {
 			PaginacaoUtil.fazerLigacaoCondicoes(condicoes, condicao);		
-			condicoes.append("lower(p.nome) like :nome");
+			condicoes.append("lower(u.nome) like :nome");
 			parametros.put("nome", "%" + filtro.getNome().toLowerCase() + "%");
 			condicao = true;
 		}
 		if (StringUtils.hasText(filtro.getCpf())) {
 			PaginacaoUtil.fazerLigacaoCondicoes(condicoes, condicao);
-			condicoes.append("p.cpf like :cpf");
+			condicoes.append("u.cpf like :cpf");
 			parametros.put("cpf", "%" + filtro.getCpf().toLowerCase() + "%");
 			condicao = true;
 		}
 
-		if (filtro.getDataNascimentoInicial() != null) {
+		if (filtro.getMetodo_bancario() != null) {
 			PaginacaoUtil.fazerLigacaoCondicoes(condicoes, condicao);
-			condicoes.append("p.dataNascimento >= :dataNascimentoInicial");
-			parametros.put("dataNascimentoInicial", filtro.getDataNascimentoInicial());
+			condicoes.append("u.metodo_bancario = :metodo_bancario");
+			parametros.put("metodo_bancario", filtro.getMetodo_bancario());
 			condicao = true;
 		}
 
-		if (filtro.getDataNascimentoFinal() != null) {
+		if (filtro.getDadosBancarios() != null) {
 			PaginacaoUtil.fazerLigacaoCondicoes(condicoes, condicao);
-			condicoes.append("p.dataNascimento <= :dataNascimentoFinal");
-			parametros.put("dataNascimentoFinal", filtro.getDataNascimentoFinal());
+			condicoes.append("u.dadosBancarios = :dadosBancarios");
+			parametros.put("dadosBancarios", filtro.getDadosBancarios());
 		}
 	}
 	

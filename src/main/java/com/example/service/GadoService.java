@@ -6,6 +6,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.example.filter.GadoFilter;
+import com.example.model.Gado;
+import com.example.model.Status;
 import com.example.repository.GadoRepository;
 
 @Service 
@@ -20,37 +24,32 @@ public class GadoService {
     }
 
     @Transactional(readOnly = true)
-    public Page<Pessoa> pesquisar(GadoFilter filtro, Pageable pageable) {
-        logger.info("Pesquisando pessoas com o filtro {}", filtro);
-        return pessoaRepository.pesquisar(filtro, pageable);
-    }
-
-    @Transactional(readOnly = true)
-    public Pessoa buscarPeloCPF(String cpf) {
-        return pessoaRepository.findByCpf(cpf);
+    public Page<Gado> pesquisar(GadoFilter filtro, Pageable pageable) {
+        logger.info("Pesquisando gados com o filtro {}", filtro);
+        return gadoRepository.pesquisar(filtro, pageable);
     }
 
     @Transactional 
-    public void salvar(Pessoa pessoa) { 
-        logger.info("Salvando pessoa: {}", pessoa); 
-        pessoaRepository.save(pessoa); 
+    public void salvar(Gado gado) { 
+        logger.info("Salvando gado: {}", gado); 
+        gadoRepository.save(gado); 
     } 
 
     @Transactional 
-    public void atualizar(Pessoa pessoa) { 
-        logger.info("Atualizando pessoa: {}", pessoa); 
-        pessoaRepository.save(pessoa); 
+    public void atualizar(Gado gado) { 
+        logger.info("Atualizando gado: {}", gado); 
+        gadoRepository.save(gado); 
     } 
 
     @Transactional 
     public void remover(Long codigo) { 
-        logger.info("Removendo pessoa com código: {}", codigo); 
-        pessoaRepository.deleteById(codigo); 
+        logger.info("Removendo gado com código: {}", codigo); 
+        gadoRepository.deleteById(codigo); 
     } 
 
     @Transactional(readOnly = true)
-    public Pessoa buscar(Long codigo) {
-        logger.info("Buscando a pessoa com código: {}", codigo);
-        return pessoaRepository.findByCodigoAndStatus(codigo, Status.ATIVO).orElse(null);
+    public Gado buscar(Long codigo) {
+        logger.info("Buscando o gado com código: {}", codigo);
+        return gadoRepository.findByCodigoAndStatus(codigo, Status.ATIVO).orElse(null);
     }
 } 
