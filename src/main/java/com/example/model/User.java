@@ -1,8 +1,10 @@
 package com.example.model;
 
 import java.io.Serializable;
+
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.Id;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -29,7 +31,7 @@ public class User implements Serializable {
 	@Enumerated(EnumType.STRING)
 	private BankMethod metodo_bancario;
 	@Column(name = "dados_bancarios")
-	private Long dadosBancarios;
+	private String dadosBancarios;
 	@Enumerated(EnumType.STRING)
     private Status status = Status.ATIVO;
 	
@@ -51,16 +53,16 @@ public class User implements Serializable {
 	public void setCpf(String cpf) {
 		this.cpf = cpf;
 	}
-	public BankMethod getMetodo_bancario() {
+	public BankMethod getMetodoBancario() {
 		return metodo_bancario;
 	}
-	public void setMetodo_bancario(BankMethod metodo_bancario) {
+	public void setMetodoBancario(BankMethod metodo_bancario) {
 		this.metodo_bancario = metodo_bancario;
 	}
-	public Long getDadosBancarios() {
+	public String getDadosBancarios() {
 		return dadosBancarios;
 	}
-	public void setDadosBancarios(Long dadosBancarios) {
+	public void setDadosBancarios(String dadosBancarios) {
 		this.dadosBancarios = dadosBancarios;
 	}
 	public Status getStatus() {

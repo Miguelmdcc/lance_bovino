@@ -1,8 +1,17 @@
 package com.example.model;
 
 import java.io.Serializable;
+
 import org.hibernate.annotations.DynamicUpdate;
-import jakarta.persistence.*;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "gado")
@@ -14,7 +23,7 @@ public class Gado implements Serializable {
     @Id
     @SequenceGenerator(name="gerador_gado", sequenceName="gado_codigo_seq", allocationSize=1)
     @GeneratedValue(generator="gerador_gado", strategy=GenerationType.SEQUENCE)
-    private Long id;
+    private Long codigo;
 
     private String nome;
     
@@ -34,12 +43,12 @@ public class Gado implements Serializable {
     }
 
     // Getters e Setters
-    public Long getId() {
-        return id;
+    public Long getCodigo() {
+        return codigo;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setCodigo(Long codigo) {
+        this.codigo = codigo;
     }
 
     public String getNome() {
@@ -93,7 +102,7 @@ public class Gado implements Serializable {
     // Método toString para ajudar nos logs do sistema
     @Override
     public String toString() {
-        return "Gado [id=" + id + ", nome=" + nome + ", peso=" + peso + ", raca=" + raca + 
+        return "Gado [codigo=" + codigo + ", nome=" + nome + ", peso=" + peso + ", raca=" + raca + 
                ", altura=" + altura + ", idade=" + idade + ", status=" + status + "]";
     }
 }
