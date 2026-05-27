@@ -90,7 +90,7 @@ public class GadoDTOInput {
         return gado;
     }
 
-    public static GadoDTOInput fromPessoa(Gado gado) {
+    public static GadoDTOInput fromGado(Gado gado) {
         GadoDTOInput dto = new GadoDTOInput();
         dto.setCodigo(gado.getCodigo());
         dto.setNome(gado.getNome());

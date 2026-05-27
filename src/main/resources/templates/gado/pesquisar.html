@@ -11,7 +11,7 @@
   <!-- conteudo principal -->
   <main layout:fragment="conteudo" th:fragment="formulario" id="main" class="flex flex-col align-middle w-full m-10">
 
-    <form th:hx-get="@{/vacina/pesquisar}" class="w-1/2 mt-10 ms-16">
+    <form th:hx-get="@{/gado/pesquisar}" class="w-1/2 mt-10 ms-16">
         <div th:replace="~{components/forms :: inputSimples('Código', codigo, 'number')}"></div> 
         <div th:replace="~{components/forms :: inputSimples('Nome', nome, 'text')}"></div> 
         <div th:replace="~{components/forms :: inputSimples('Descrição', descricao, 'text')}"></div> 
