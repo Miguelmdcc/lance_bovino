@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR" 
+      layout:decorate="~{layout/layoutpadrao}" 
+      xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8" />
+    <title>Alterar Leilão</title>
+</head>
+<body>
+
+    <main layout:fragment="conteudo" id="main" class="container mx-auto p-6 max-w-lg">
+        
+        <h1 class="text-2xl font-bold mb-6 text-gray-800">Editar Leilão</h1>
+
+        <form th:fragment="formulario" 
+              th:object="${leilao}" 
+              hx-post="/leilao/alterar" 
+              hx-target="#main" 
+              class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 border border-gray-200">
+            
+            <input type="hidden" th:field="*{id}" />
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="nome">
+                    Nome do Leilão
+                </label>
+                <input th:field="*{nome}" 
+                       type="text" 
+                       id="nome" 
+                       class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                <p th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}" class="text-red-500 text-xs italic mt-1"></p>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="initialPrice">
+                    Preço Inicial (R$)
+                </label>
+                <input th:field="*{initialPrice}" 
+                       type="number" 
+                       step="0.01" 
+                       id="initialPrice" 
+                       class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                <p th:if="${#fields.hasErrors('initialPrice')}" th:errors="*{initialPrice}" class="text-red-500 text-xs italic mt-1"></p>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="finalTimestamp">
+                    Data e Hora de Encerramento
+                </label>
+                <input th:field="*{finalTimestamp}" 
+                       type="datetime-local" 
+                       id="finalTimestamp" 
+                       class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                <p th:if="${#fields.hasErrors('finalTimestamp')}" th:errors="*{finalTimestamp}" class="text-red-500 text-xs italic mt-1"></p>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="status">
+                    Status do Leilão
+                </label>
+                <div class="relative">
+                    <select th:field="*{status}" 
+                            id="status" 
+                            class="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option th:each="statusEnum : ${T(com.example.model.StatusLeilao).values()}" 
+                                th:value="${statusEnum}" 
+                                th:text="${statusEnum.descricao}">Status</option>
+                    </select>
+                </div>
+                <p th:if="${#fields.hasErrors('status')}" th:errors="*{status}" class="text-red-500 text-xs italic mt-1"></p>
+            </div>
+
+            <div class="flex items-center justify-between">
+                <button type="submit" 
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-200">
+                    Atualizar Leilão
+                </button>
+                <a th:href="@{/}" class="inline-block align-baseline font-bold text-sm text-gray-500 hover:text-gray-800">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+
+    </main>
+
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.thymeleaf.org" layout:decorate="~{layout/layoutpadrao}" >
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
+  <title>Listagem de Gado</title>
+</head>
+
+<body>
+  <main layout:fragment="conteudo" th:fragment="tabela" id="main" class="flex flex-col align-middle w-full m-10">
+    
+    <h1 th:if="${pagina.vazia}" class="text-2xl md:text-4xl text-center text-gray-500 italic">
+        Não foram encontrados gados com essa pesquisa
+    </h1>
+
+    <div th:if="${not pagina.vazia}" class="flex flex-col mr-10 ml-10 mt-5">
+      <div class="overflow-x-auto">
+        <div class="min-w-full inline-block align-middle">
+          <div class="border rounded-xl overflow-hidden shadow bg-white">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th:block th:replace="~{components/paginacao :: coluna(${pagina}, 'codigo', 'Código', '')}"></th:block>
+                  <th:block th:replace="~{components/paginacao :: coluna(${pagina}, 'nome', 'Nome', '')}"></th:block>
+                  
+                  <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Raça</th>
+                  <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Peso (kg)</th>
+                  <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Idade</th>
+                  <th scope="col" colspan="2" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Ações</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                <tr th:each="gado : ${pagina.conteudo}" class="odd:bg-white even:bg-gray-50 hover:bg-gray-100 transition duration-150">
+                  <td th:text="${gado.codigo}" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">01</td>
+                  <td th:text="${gado.nome}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">Mimosa</td>
+                  <td th:text="${gado.raca}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Nelore</td>
+                  <td th:text="${gado.peso}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">450.5</td>
+                  <td th:text="${gado.idade}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">24 meses</td>
+                  
+                  <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                    <a th:hx-get="@{/gado/alterar/{codigo}(codigo=${gado.codigo})}" 
+                       hx-target="#main"
+                       class="cursor-pointer text-blue-600 hover:text-blue-500 decoration-2 hover:underline focus:outline-none">Alterar</a>
+                  </td>
+                  
+                  <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                    <a th:hx-get="@{/gado/remover/{codigo}(codigo=${gado.codigo})}" 
+                       hx-target="#main"
+                       th:hx-confirm="${'Você vai remover o gado ' + gado.nome + '!'}" 
+                       class="cursor-pointer text-red-600 hover:text-red-500 decoration-2 hover:underline focus:outline-none">Remover</a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <div th:replace="~{components/paginacao :: paginacao(${pagina})}"></div> 
+        </div>
+      </div>
+    </div>
+    
+  </main>
+  </body>
+
+</html>

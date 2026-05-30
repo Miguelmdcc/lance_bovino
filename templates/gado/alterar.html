@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.thymeleaf.org" layout:decorate="~{layout/layoutpadrao}" >
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
+  <title>Alterar Gado</title>
+</head>
+
+<body>
+  <main layout:fragment="conteudo" th:fragment="formulario" id="main" class="flex flex-col align-middle w-full m-10">
+
+    <h1 th:if="${gadoDTOInput == null}" class="text-2xl md:text-4xl text-center">Não foi encontrado gado com esse código</h1>
+
+    <form th:if="${gadoDTOInput != null}" th:hx-post="@{/gado/alterar}" th:object="${gadoDTOInput}" class="w-1/2 mt-10 ms-16">
+        
+        <input type="hidden" name="codigo" th:value="*{codigo}">
+        
+        <label for="codigo" class="block text-gray-700 font-medium mb-2">Código</label>
+        <input type="number" id="codigo" th:value="*{codigo}" disabled="true" class="w-1/2 py-3 px-4 text-gray-500 border-gray-300 rounded-lg focus:border-gray-500 focus:ring-gray-500 disabled:opacity-50 disabled:pointer-events-none" />
+        
+        <div th:replace="~{components/forms :: inputValidado('Nome', nome, 'text')}"></div> 
+        <div th:replace="~{components/forms :: inputValidado('Raça', raca, 'text')}"></div> 
+        <div th:replace="~{components/forms :: inputValidado('Peso (kg)', peso, 'number')}"></div> 
+        <div th:replace="~{components/forms :: inputValidado('Altura (m)', altura, 'number')}"></div> 
+        <div th:replace="~{components/forms :: inputValidado('Idade', idade, 'number')}"></div> 
+        
+        <button type="submit" class="mt-7 py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-100 text-blue-800 hover:bg-blue-200 focus:outline-none focus:bg-blue-200 disabled:opacity-50 disabled:pointer-events-none">
+            Alterar
+        </button>
+    </form>
+
+  </main>
+  </body>
+
+</html>

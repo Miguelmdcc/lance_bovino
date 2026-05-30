@@ -1,0 +1,132 @@
+package web.lance_bovino.controller;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import web.lance_bovino.dto.GadoDTOInput;
+import web.lance_bovino.filter.GadoFilter;
+import web.lance_bovino.model.Gado;
+import web.lance_bovino.model.Status;
+import web.lance_bovino.notification.NotificacaoSweetAlert2;
+import web.lance_bovino.notification.TipoNotificaoSweetAlert2;
+import web.lance_bovino.pagination.PageWrapper;
+import web.lance_bovino.service.GadoService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+
+@Controller
+public class GadoController {
+
+    private static final Logger logger = LoggerFactory.getLogger(GadoController.class);
+
+    private final GadoService gadoService;
+
+    public GadoController(GadoService gadoService) {
+        this.gadoService = gadoService;
+    }
+
+    @GetMapping("/gado/abrirpesquisar")
+    public String abrirPesquisa() {
+        logger.debug("Entrando na pesquisa"); // Corrigido erro de digitação
+        return "gado/pesquisar :: formulario";
+    }
+
+    @GetMapping("/gado/pesquisar")
+    public String pesquisar(GadoFilter filtro, Model model,
+            // CORRIGIDO: mudado de "codigo" para "id" para bater com a entidade Gado
+            @PageableDefault(size = 9) @SortDefault(sort = "id", 
+                    direction = Sort.Direction.ASC) Pageable pageable,
+            HttpServletRequest request) {
+            
+        Page<Gado> pagina = gadoService.pesquisar(filtro, pageable);
+        logger.info("Gados pesquisados: {}", pagina.getContent());
+        
+        PageWrapper<Gado> paginaWrapper = new PageWrapper<>(pagina, request);
+        model.addAttribute("pagina", paginaWrapper);
+        
+        return "gado/mostrar :: tabela";
+    }
+
+    @GetMapping("/gado/cadastrar")
+    public String abrirCadastro(GadoDTOInput dto) {
+        return "gado/cadastrar :: formulario";
+    }
+
+    @PostMapping("/gado/cadastrar")
+    public String cadastrar(@Valid GadoDTOInput dto, BindingResult resultado,
+            RedirectAttributes atributos) {
+        if (resultado.hasErrors()) {
+            logger.info("O gado recebido para cadastrar não é válido.");
+            for (FieldError erro : resultado.getFieldErrors()) {
+                logger.info("{}", erro);
+            }
+            for (ObjectError erro : resultado.getGlobalErrors()) {
+                logger.info("{}", erro);
+            }
+            return "gado/cadastrar :: formulario";
+        } else {
+            gadoService.salvar(dto.toGado());
+            atributos.addFlashAttribute("notificacao", new NotificacaoSweetAlert2(
+                    "Gado cadastrado com sucesso!", TipoNotificaoSweetAlert2.SUCCESS, 4000));
+            return "redirect:/gado/cadastrar";
+        }
+    }
+
+    // CORRIGIDO: Variável mudada para {id}
+    @GetMapping("/gado/alterar/{id}")
+    public String abrirAlterar(@PathVariable Long id, Model model) {
+        GadoDTOInput dto = GadoDTOInput.fromGado(gadoService.buscar(id));
+        model.addAttribute("gadoDTOInput", dto);
+        return "gado/alterar :: formulario";
+    }
+
+    @PostMapping("/gado/alterar")
+    public String alterar(@Valid GadoDTOInput dto, BindingResult resultado,
+            RedirectAttributes atributos) {
+        if (resultado.hasErrors()) {
+            logger.info("O gado recebido para alterar não é válido.");
+            for (FieldError erro : resultado.getFieldErrors()) {
+                logger.info("{}", erro);
+            }
+            for (ObjectError erro : resultado.getGlobalErrors()) {
+                logger.info("{}", erro);
+            }
+            return "gado/alterar :: formulario";
+        } else {
+            gadoService.atualizar(dto.toGado());
+            atributos.addFlashAttribute("notificacao", new NotificacaoSweetAlert2(
+                    "Gado alterado com sucesso!", TipoNotificaoSweetAlert2.SUCCESS, 4000));
+            return "redirect:/gado/abrirpesquisar";
+        }
+    }
+
+    // CORRIGIDO: Variável para {id} e padronização do SweetAlert2 e redirecionamento
+    @GetMapping("/gado/remover/{id}")
+    public String remover(@PathVariable Long id, RedirectAttributes atributos) {
+        Gado gado = gadoService.buscar(id);
+        if (gado != null) {
+            gado.setStatus(Status.INATIVO);
+            gadoService.atualizar(gado);
+            atributos.addFlashAttribute("notificacao", new NotificacaoSweetAlert2(
+                    "Gado removido com sucesso!", TipoNotificaoSweetAlert2.SUCCESS, 4000));
+        } else {
+            atributos.addFlashAttribute("notificacao", new NotificacaoSweetAlert2(
+                    "Não foi encontrado um gado com esse ID.", TipoNotificaoSweetAlert2.ERROR, 4000));
+        }
+        return "redirect:/gado/abrirpesquisar";
+    }
+}

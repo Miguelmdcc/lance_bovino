@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR" 
+      layout:decorate="~{layout/layoutpadrao}" 
+      xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8" />
+    <title>Cadastrar Leilão</title>
+</head>
+<body>
+
+    <main layout:fragment="conteudo" id="main" class="container mx-auto p-6 max-w-lg">
+        
+        <h1 class="text-2xl font-bold mb-6 text-gray-800">Novo Leilão de Gado</h1>
+
+        <form th:fragment="formulario" 
+              th:object="${leilao}" 
+              hx-post="/leilao/cadastrar" 
+              hx-target="#main" 
+              class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 border border-gray-200">
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="nome">
+                    Nome do Leilão
+                </label>
+                <input th:field="*{nome}" 
+                       type="text" 
+                       id="nome" 
+                       placeholder="Ex: Lote 10 - Nelore de Elite"
+                       class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                <p th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}" class="text-red-500 text-xs italic mt-1"></p>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="initialPrice">
+                    Preço Inicial (R$)
+                </label>
+                <input th:field="*{initialPrice}" 
+                       type="number" 
+                       step="0.01" 
+                       id="initialPrice" 
+                       placeholder="0.00"
+                       class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                <p th:if="${#fields.hasErrors('initialPrice')}" th:errors="*{initialPrice}" class="text-red-500 text-xs italic mt-1"></p>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="finalTimestamp">
+                    Data e Hora de Encerramento
+                </label>
+                <input th:field="*{finalTimestamp}" 
+                       type="datetime-local" 
+                       id="finalTimestamp" 
+                       class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                <p th:if="${#fields.hasErrors('finalTimestamp')}" th:errors="*{finalTimestamp}" class="text-red-500 text-xs italic mt-1"></p>
+            </div>
+
+            <div class="flex items-center justify-between">
+                <button type="submit" 
+                        class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-200">
+                    Salvar Leilão
+                </button>
+                <a th:href="@{/}" class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+
+    </main>
+
+</body>
+</html>
