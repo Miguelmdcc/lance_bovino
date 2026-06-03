@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.thymeleaf.org" layout:decorate="~{layout/layoutpadrao}" >
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
+  <title>Cadastrar Gado</title>
+</head>
+
+<body>
+  <!-- conteudo principal -->
+  <main layout:fragment="conteudo" th:fragment="formulario" id="main" class="flex flex-col align-middle w-full m-10">
+
+    <form th:hx-post="@{/gado/cadastrar}" th:object="${gadoDTOInput}" class="w-1/2 mt-10 ms-16">
+        <div th:replace="~{components/forms :: inputValidado('Nome', nome, 'text')}"></div> 
+        <div th:replace="~{components/forms :: inputValidado('Peso(KG)', peso, 'number')}"></div> 
+        <div th:replace="~{components/forms :: inputValidado('Raça', raca, 'text')}"></div> 
+        <div th:replace="~{components/forms :: inputValidado('Altura(M)', altura, 'number')}"></div> 
+        <div th:replace="~{components/forms :: inputValidado('Idade(Meses)', idade, 'number')}"></div> 
+        <button type="submit" class="mt-7 py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-100 text-blue-800 hover:bg-blue-200 focus:outline-none focus:bg-blue-200 disabled:opacity-50 disabled:pointer-events-none">Cadastrar</button>
+    </form>
+
+  </main>
+  <!-- !conteudo principal -->
+
+</body>
+
+</html>
