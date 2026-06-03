@@ -4,7 +4,7 @@ import java.security.InvalidParameterException;
 
 import org.springframework.stereotype.Service;
 import web.lance_bovino.dto.UsuarioDTOInput;
-import web.lance_bovino.model.User;
+import web.lance_bovino.model.Usuario;
 import web.lance_bovino.service.UsuarioService;
 
 @Service
@@ -22,14 +22,14 @@ public class CPFUnicoServiceImpl implements CPFUnicoService {
 			throw new UnsupportedOperationException("A anotação deveria ser usada no atributo cpf");
 		}
 
-		User novo = ((UsuarioDTOInput) value).toUser();
+		Usuario novo = ((UsuarioDTOInput) value).toUser();
 		//A validacao "foi preenchido um cpf" nao eh obrigacao dessa verificacao
 		if (novo.getCpf() == null || novo.getCpf().isBlank()) {
 			return true;
 		}
 		
 		//Busca um usuario com esse CPF
-		User comEsseCPF = usuarioService.buscarPeloCPF(novo.getCpf());
+		Usuario comEsseCPF = usuarioService.buscarPeloCPF(novo.getCpf());
 		
 		//Nao existe um usuario com esse cpf, entao tudo bem
 		if (comEsseCPF == null) {
@@ -39,7 +39,7 @@ public class CPFUnicoServiceImpl implements CPFUnicoService {
 			if (novo.getCodigo() == null) {
 				return false;
 			} else {  //O usuario sendo validado ja existe
-				User antigo = usuarioService.buscar(novo.getCodigo());
+				Usuario antigo = usuarioService.buscar(novo.getCodigo());
                 if (antigo == null) {
                     throw new InvalidParameterException("O código do contato a validar não existe.");
                 }

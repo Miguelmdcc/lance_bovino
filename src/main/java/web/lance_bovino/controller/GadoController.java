@@ -109,6 +109,12 @@ public class GadoController {
         }
     }
 
+    @GetMapping("/mensagem")
+    public String mostrarMensagem() {
+        // Retorna o arquivo mensagem.html que está na raiz da pasta templates
+        return "mensagem"; 
+    }
+
     @GetMapping("/gado/remover/{codigo}")
     public String remover(@PathVariable Long codigo, RedirectAttributes atributos) {
         Gado gado = gadoService.buscar(codigo);

@@ -3,13 +3,13 @@ package web.lance_bovino.repository;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import web.lance_bovino.model.Status;
-import web.lance_bovino.model.User;
+import web.lance_bovino.model.Usuario;
 import web.lance_bovino.repository.queries.usuario.UsuarioQueries;
 
-public interface UsuarioRepository extends JpaRepository<User, Long>, UsuarioQueries {
+public interface UsuarioRepository extends JpaRepository<Usuario, Long>, UsuarioQueries {
 
-    Optional<User> findByCodigoAndStatus(long codigo, Status status);
+    Optional<Usuario> findByCodigoAndStatus(long codigo, Status status);
 
-    User findByCpf(String cpf);
+    Usuario findByCpf(String cpf);
 
 }

@@ -3,7 +3,7 @@ package web.lance_bovino.dto;
 import org.hibernate.validator.constraints.br.CPF;
 import web.lance_bovino.model.BankMethod;
 import web.lance_bovino.model.Status;
-import web.lance_bovino.model.User;
+import web.lance_bovino.model.Usuario;
 import web.lance_bovino.validation.UniqueValueAttribute;
 import web.lance_bovino.validation.cpfunico.CPFUnicoService;
 import jakarta.validation.constraints.NotBlank;
@@ -73,8 +73,8 @@ public class UsuarioDTOInput {
         this.status = status;
     }
 
-    public User toUser() {
-        User user = new User();
+    public Usuario toUser() {
+        Usuario user = new Usuario();
         user.setCodigo(codigo);
         user.setNome(nome);
         user.setCpf(cpf);
@@ -84,7 +84,7 @@ public class UsuarioDTOInput {
         return user;
     }
 
-    public static UsuarioDTOInput fromPessoa(User usuario) {
+    public static UsuarioDTOInput fromPessoa(Usuario usuario) {
         UsuarioDTOInput dto = new UsuarioDTOInput();
         dto.setCodigo(usuario.getCodigo());
         dto.setNome(usuario.getNome());

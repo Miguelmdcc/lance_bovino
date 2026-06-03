@@ -1,9 +1,11 @@
 package web.lance_bovino.dto;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import web.lance_bovino.model.Gado;
 import web.lance_bovino.model.Status;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 
 public class GadoDTOInput {
 
@@ -11,13 +13,16 @@ public class GadoDTOInput {
     @NotBlank(message = "O nome do gado é obrigatório")
     @Size(max = 255, message = "O tamanho máximo do nome é 255 caracteres")
     private String nome;
-    @NotBlank(message = "O peso do gado é obrigatório")
+    @NotNull(message = "O peso do gado é obrigatório")
+    @Min(value = 1, message = "O peso do gado deve ser maior que 0")
     private Double peso;
     @NotBlank(message = "A raça do gado é obrigatória")
     private String raca;
-    @NotBlank(message = "A altura do gado é obrigatória")
+    @NotNull(message = "A altura do gado é obrigatória")
+    @Min(value = 1, message = "A altura do gado deve ser maior que 0")
     private Double altura;
-    @NotBlank(message = "A idade do gado é obrigatória")
+    @NotNull(message = "A idade do gado é obrigatória")
+    @Min(value = 1, message = "A idade do gado deve ser maior que 0")
     private Integer idade;
     private Status status = Status.ATIVO;
 

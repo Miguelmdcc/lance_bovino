@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import web.lance_bovino.filter.UsuarioFilter;
 import web.lance_bovino.model.Status;
-import web.lance_bovino.model.User;
+import web.lance_bovino.model.Usuario;
 import web.lance_bovino.repository.UsuarioRepository;
 
 @Service 
@@ -23,24 +23,24 @@ public class UsuarioService {
     }
 
     @Transactional(readOnly = true)
-    public Page<User> pesquisar(UsuarioFilter filtro, Pageable pageable) {
+    public Page<Usuario> pesquisar(UsuarioFilter filtro, Pageable pageable) {
         logger.info("Pesquisando usuários com o filtro {}", filtro);
         return pessoaRepository.pesquisar(filtro, pageable);
     }
 
     @Transactional(readOnly = true)
-    public User buscarPeloCPF(String cpf) {
+    public Usuario buscarPeloCPF(String cpf) {
         return pessoaRepository.findByCpf(cpf);
     }
 
     @Transactional 
-    public void salvar(User pessoa) { 
+    public void salvar(Usuario pessoa) { 
         logger.info("Salvando pessoa: {}", pessoa); 
         pessoaRepository.save(pessoa); 
     } 
 
     @Transactional 
-    public void atualizar(User pessoa) { 
+    public void atualizar(Usuario pessoa) { 
         logger.info("Atualizando pessoa: {}", pessoa); 
         pessoaRepository.save(pessoa); 
     } 
@@ -52,7 +52,7 @@ public class UsuarioService {
     } 
 
     @Transactional(readOnly = true)
-    public User buscar(Long codigo) {
+    public Usuario buscar(Long codigo) {
         logger.info("Buscando o usuário com código: {}", codigo);
         return pessoaRepository.findByCodigoAndStatus(codigo, Status.ATIVO).orElse(null);
     }

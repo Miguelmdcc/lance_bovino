@@ -9,7 +9,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
 import web.lance_bovino.filter.UsuarioFilter;
-import web.lance_bovino.model.User;
+import web.lance_bovino.model.Usuario;
 import web.lance_bovino.pagination.PaginacaoUtil;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -20,7 +20,7 @@ public class UsuarioQueriesImpl implements UsuarioQueries {
 	@PersistenceContext
 	private EntityManager em;
 
-   	public Page<User> pesquisar(UsuarioFilter filtro, Pageable pageable) {
+   	public Page<Usuario> pesquisar(UsuarioFilter filtro, Pageable pageable) {
 
 		StringBuilder queryUsuarios = new StringBuilder("select distinct u from User u");
 		StringBuilder condicoes = new StringBuilder();
@@ -36,10 +36,10 @@ public class UsuarioQueriesImpl implements UsuarioQueries {
 
 		queryUsuarios.append(condicoes);
 		PaginacaoUtil.prepararOrdemJPQL(queryUsuarios, "u", pageable);
-		TypedQuery<User> typedQuery = em.createQuery(queryUsuarios.toString(), User.class);
+		TypedQuery<Usuario> typedQuery = em.createQuery(queryUsuarios.toString(), Usuario.class);
 		PaginacaoUtil.prepararIntervalo(typedQuery, pageable);
 		PaginacaoUtil.preencherParametros(parametros, typedQuery);
-		List<User> usuarios = typedQuery.getResultList();
+		List<Usuario> usuarios = typedQuery.getResultList();
 
 		long totalUsuarios = PaginacaoUtil.getTotalRegistros("User", "u", condicoes, parametros, em);
 
