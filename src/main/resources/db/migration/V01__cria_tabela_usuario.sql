@@ -13,6 +13,6 @@ CREATE TABLE public.usuario
 );
 
 INSERT INTO usuario (nome, cpf, metodo_bancario, dados_bancarios, senha) VALUES
-('Teste', 123654789, 'PIX','450cvv','12345');
+('Teste ADM', 123654789, 'PIX','450cvv','{noop}12345');
 
 END;
