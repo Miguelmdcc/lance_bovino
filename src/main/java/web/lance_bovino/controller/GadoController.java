@@ -109,23 +109,19 @@ public class GadoController {
         }
     }
 
-    @GetMapping("/mensagem")
-    public String mostrarMensagem() {
-        // Retorna o arquivo mensagem.html que está na raiz da pasta templates
-        return "mensagem"; 
-    }
-
     @GetMapping("/gado/remover/{codigo}")
     public String remover(@PathVariable Long codigo, RedirectAttributes atributos) {
         Gado gado = gadoService.buscar(codigo);
         if (gado != null) {
             gado.setStatus(Status.INATIVO);
             gadoService.atualizar(gado);
-            atributos.addFlashAttribute("mensagem", "Gado removido com sucesso");
+            atributos.addFlashAttribute("mensagem", "Gado removida com sucesso");
         } else {
             atributos.addFlashAttribute("mensagem",
-                    "Não foi encontrado um gado com esse codigo");
+                    "Não foi encontrada um gado com esse codigo");
         }
-        return "redirect:/mensagem";
+        atributos.addFlashAttribute("notificacao", new NotificacaoSweetAlert2("Gado removido com sucesso!", TipoNotificaoSweetAlert2.SUCCESS, 4000));
+        return "redirect:/gado/abrirpesquisar";
     }
+
 }
