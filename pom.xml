@@ -25,8 +25,8 @@
 		<disruptor.version>4.0.0</disruptor.version>
 
 		<!-- Versao do Tailwind -->
-        <tailwind-maven-plugin.version>1.1.0</tailwind-maven-plugin.version>
-        <tailwind.version>v4.2.4</tailwind.version>
+		<tailwind-maven-plugin.version>1.1.0</tailwind-maven-plugin.version>
+		<tailwind.version>v4.2.4</tailwind.version>
 	</properties>
 
 	<dependencies>
@@ -118,6 +118,13 @@
 			<scope>runtime</scope>
 		</dependency>
 
+		<!-- Adiciona a dependência do JasperReports -->
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports-pdf</artifactId>
+			<version>7.0.6</version>
+		</dependency>
+
 		<!-- Adiciona as dependências de Bean Validation -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -130,13 +137,6 @@
 			<artifactId>commons-validator</artifactId>
 			<version>1.10.1</version>
 		</dependency>
-		
-		<!-- Adiciona a dependência do JasperReports -->
-		<dependency>
-			<groupId>net.sf.jasperreports</groupId>
-			<artifactId>jasperreports-pdf</artifactId>
-			<version>7.0.6</version>
-		</dependency>
 
 		<!-- Adiciona as dependências de Segurança -->
 		<dependency>
@@ -145,14 +145,13 @@
 		</dependency>
 		<dependency>
 			<groupId>org.thymeleaf.extras</groupId>
-			<artifactId>thymeleaf-extras-springsecurity6</artifactId>	
+			<artifactId>thymeleaf-extras-springsecurity6</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcprov-jdk18on</artifactId>
-			<version>1.80</version>
+			<version>1.84</version>
 		</dependency>
-
 		<dependency>
 			<groupId>io.github.wimdeblauwe</groupId>
 			<artifactId>htmx-spring-boot-thymeleaf</artifactId>
@@ -171,50 +170,50 @@
 			</plugin>
 
 			<plugin>
-                <groupId>io.github.4ndreidev</groupId>
-                <artifactId>tailwind-maven-plugin</artifactId>
-                <version>${tailwind-maven-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <inputFile>${project.basedir}/src/main/resources/static/css/input.css</inputFile>
-                    <outputFile>${project.basedir}/src/main/resources/static/css/style.css</outputFile>
-                </configuration>
-            </plugin>
+				<groupId>io.github.4ndreidev</groupId>
+				<artifactId>tailwind-maven-plugin</artifactId>
+				<version>${tailwind-maven-plugin.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<inputFile>${project.basedir}/src/main/resources/static/css/input.css</inputFile>
+					<outputFile>${project.basedir}/src/main/resources/static/css/style.css</outputFile>
+				</configuration>
+			</plugin>
 		</plugins>
 		<pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.eclipse.m2e</groupId>
-                    <artifactId>lifecycle-mapping</artifactId>
-                    <version>1.0.0</version>
-                    <configuration>
-                        <lifecycleMappingMetadata>
-                            <pluginExecutions>
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>io.github.4ndreidev</groupId>
-                                        <artifactId>tailwind-maven-plugin</artifactId>
-                                        <versionRange>[1.0.0,)</versionRange>
-                                        <goals>
-                                            <goal>compile</goal>
-                                        </goals>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <ignore />
-                                    </action>
-                                </pluginExecution>
-                            </pluginExecutions>
-                        </lifecycleMappingMetadata>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>io.github.4ndreidev</groupId>
+										<artifactId>tailwind-maven-plugin</artifactId>
+										<versionRange>[1.0.0,)</versionRange>
+										<goals>
+											<goal>compile</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 
 </project>

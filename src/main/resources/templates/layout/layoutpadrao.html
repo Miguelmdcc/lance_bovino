@@ -39,8 +39,8 @@
   <!-- Aplicação Principal (Global) -->
   <script th:src="@{/js/app.js}" defer></script>
   <!-- Isso está aqui apenas para o 1o acesso depois de logar -->
-  <meta name="_csrf" th:content="${_csrf != null ? _csrf.token : ''}" />
-  <meta name="_csrf_header" th:content="${_csrf != null ? _csrf.headerName : ''}" />
+  <meta name="_csrf" th:content="${_csrf.token}" />
+  <meta name="_csrf_header" th:content="${_csrf.headerName}" />
 </head>
 
 <body hx-ext="response-targets" hx-target="#main" hx-target-5*="#main" hx-target-4*="#main">
