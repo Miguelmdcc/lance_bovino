@@ -507,111 +507,158 @@
 
 </th:block>
 
-
-
-
-<th:block th:fragment="inputBuscavelSimples(textoLabel, nomeAtributo, placeholderBusca, urlBusca)"
+<th:block th:fragment="inputBuscavel"
+  th:with="
+    validFlag=${isValidado ?: false},
+    valAtributo=${valorAtributo ?: null},
+    txtAtributo=${textoAtributo ?: 'Selecione uma opção'}" 
   xmlns:th="http://www.thymeleaf.org">
-  <div class="searchable-select-container relative w-full mt-6">
-    <label th:for="${nomeAtributo}" th:text="${textoLabel}" class="block text-gray-700 font-medium mb-2">Seu
-      Label</label>
-    <div class="relative w-full">
-      <div
-        class="custom-select-trigger flex items-center justify-between w-full px-4 py-3 text-gray-500 text-base font-normal border border-gray-300 rounded-lg cursor-pointer bg-white"
-        th:attr="data-dropdown-target=${'#' + nomeAtributo + '-dropdown'}">
-        <span class="selected-value-span" th:id="${nomeAtributo + '-selected-text'}">Selecione uma opção</span>
-        <svg class="w-4 h-4 ml-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-        </svg>
-      </div>
-      <div
-        class="custom-select-dropdown absolute z-20 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg hidden"
-        th:id="${nomeAtributo + '-dropdown'}">
-        <div class="p-2 border-b border-gray-200">
-          <div class="relative">
-            <input type="text"
-              class="w-full p-1 border border-gray-300 rounded-md focus:outline-none focus:ring-transparent"
-              th:placeholder="${placeholderBusca}" th:name="${nomeAtributo+ 'Busca'}" autocomplete="off"
-              th:hx-get="@{__${urlBusca}__}" th:hx-target="${'#' + nomeAtributo + '-list'}"
-              hx-trigger="keyup changed delay:500ms" hx-swap="innerHTML" />
-            <div class="absolute inset-y-0 end-0 flex items-center pe-3 pointer-events-none">
-              <svg class="size-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
+
+  <th:block th:if="${validFlag}">
+    <div class="searchable-select-container relative w-full mt-6" th:with="temErro=${#fields.hasErrors('__${nomeAtributo}__')}">
+      <label th:for="${nomeAtributo}" th:text="${textoLabel}" th:class="|block font-medium mb-2 ${temErro ? 'text-red-600' : 'text-gray-700'}|"></label>
+      
+      <div class="relative w-full">
+        <div class="custom-select-trigger flex items-center justify-between w-full px-4 py-3 text-base font-normal border rounded-lg cursor-pointer bg-white"
+             th:classappend="${temErro ? 'border-red-300 text-red-600 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 text-gray-500 focus:border-gray-500 focus:ring-gray-500'}"
+             th:attr="data-dropdown-target=${'#' + nomeAtributo + '-dropdown'}">
+          
+          <span class="selected-value-span truncate" th:id="${nomeAtributo + '-selected-text'}" th:text="${txtAtributo}"></span>
+          
+          <th:block th:if="${!temErro}">
+            <svg class="w-4 h-4 ml-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </th:block>
+        </div>
+        
+        <div th:if="${temErro}" class="end-0 absolute items-center inset-y-0 flex pointer-events-none justify-center pe-3" style="top: 0.5rem; bottom: 0.5rem;">
+          <svg class="shrink-0 size-4 text-red-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" x2="12" y1="8" y2="12"></line>
+            <line x1="12" x2="12.01" y1="16" y2="16"></line>
+          </svg>
+        </div>
+
+        <div class="custom-select-dropdown absolute z-20 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg hidden" th:id="${nomeAtributo + '-dropdown'}">
+          <div class="p-2 border-b border-gray-200">
+            <div class="relative">
+              <input type="text" class="w-full p-1 border border-gray-300 rounded-md focus:outline-none focus:ring-transparent"
+                     th:placeholder="${placeholderBusca}" th:name="${nomeAtributo + 'Busca'}" autocomplete="off"
+                     th:hx-get="@{__${urlBusca}__}" th:hx-target="${'#' + nomeAtributo + '-list'}"
+                     hx-trigger="keyup changed delay:500ms" hx-swap="innerHTML" />
+              <div class="absolute inset-y-0 end-0 flex items-center pe-3 pointer-events-none">
+                <svg class="size-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+              </div>
             </div>
           </div>
+          <ul class="options-list max-h-60 overflow-y-auto" th:id="${nomeAtributo + '-list'}"></ul>
         </div>
-        <ul class="options-list max-h-60 overflow-y-auto" th:id="${nomeAtributo + '-list'}">
-        </ul>
       </div>
-    </div>
-    <input type="hidden" class="hidden-select-input" th:name="${nomeAtributo}" th:id="${nomeAtributo}" />
-  </div>
-</th:block>
 
-<th:block
-  th:fragment="inputBuscavelValidado(textoLabel, nomeAtributo, valorAtributo, textoAtributo, placeholderBusca, urlBusca)"
-  th:with="
-      temErro=${#fields.hasErrors('__${nomeAtributo}__')},
-      classesBordaFocus=${temErro ? ' border-red-300 focus:border-red-500 focus:ring-red-500' : ' border-gray-300 focus:border-gray-500 focus:ring-gray-500'},
-      paddingErro='pe-3'" xmlns:th="http://www.thymeleaf.org">
-  <div class="searchable-select-container relative w-full mt-6">
-    <label th:for="${nomeAtributo}" th:text="${textoLabel}" class="block text-gray-700 font-medium mb-2">Seu
-      Label</label>
-    <div class="relative w-full">
-      <div
-        th:class="|custom-select-trigger flex items-center justify-between w-full px-4 py-3 text-gray-500 text-base font-normal border rounded-lg cursor-pointer bg-white ${classesBordaFocus}|"
-        th:attr="data-dropdown-target=${'#' + nomeAtributo + '-dropdown'}">
-        <span class="selected-value-span" th:id="${nomeAtributo + '-selected-text'}"
-          th:text="${textoAtributo}">BlaBla</span>
-        <th:block th:if="${!temErro}">
-          <svg class="w-4 h-4 ml-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg">
+      <input type="hidden" class="hidden-select-input" th:name="${nomeAtributo}" th:id="${nomeAtributo}" th:value="${valAtributo}" />
+      
+      <p th:if="${temErro}" th:each="erro : ${#fields.errors('__${nomeAtributo}__')}" th:text="${erro} + '. '" class="text-sm text-red-600 mt-2"></p>
+    </div>
+  </th:block>
+
+  <th:block th:unless="${validFlag}">
+    <div class="searchable-select-container relative w-full mt-6">
+      <label th:for="${nomeAtributo}" th:text="${textoLabel}" class="block text-gray-700 font-medium mb-2"></label>
+      
+      <div class="relative w-full">
+        <div class="custom-select-trigger flex items-center justify-between w-full px-4 py-3 text-gray-500 text-base font-normal border border-gray-300 rounded-lg cursor-pointer bg-white"
+             th:attr="data-dropdown-target=${'#' + nomeAtributo + '-dropdown'}">
+          
+          <span class="selected-value-span truncate" th:id="${nomeAtributo + '-selected-text'}" th:text="${txtAtributo}"></span>
+          
+          <svg class="w-4 h-4 ml-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
           </svg>
-        </th:block>
-      </div>
-      <div th:if="${temErro}"
-        th:class="${'end-0 absolute items-center inset-y-0 flex pointer-events-none justify-center ' + paddingErro}"
-        style="top: 0.5rem; bottom: 0.5rem;"> <svg class="shrink-0 size-4 text-red-500"
-          xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="12" x2="12" y1="8" y2="12"></line>
-          <line x1="12" x2="12.01" y1="16" y2="16"></line>
-        </svg>
-      </div>
-      <div
-        class="custom-select-dropdown absolute z-20 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg hidden"
-        th:id="${nomeAtributo + '-dropdown'}">
-        <div class="p-2 border-b border-gray-200">
-          <div class="relative">
-            <input type="text"
-              class="w-full p-1 border border-gray-300 rounded-md focus:outline-none focus:ring-transparent"
-              th:placeholder="${placeholderBusca}" th:name="${nomeAtributo+ 'Busca'}" autocomplete="off"
-              th:hx-get="@{__${urlBusca}__}" th:hx-target="${'#' + nomeAtributo + '-list'}"
-              hx-trigger="keyup changed delay:500ms" hx-swap="innerHTML" />
-            <div class="absolute inset-y-0 end-0 flex items-center pe-3 pointer-events-none">
-              <svg class="size-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
+        </div>
+
+        <div class="custom-select-dropdown absolute z-20 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg hidden" th:id="${nomeAtributo + '-dropdown'}">
+          <div class="p-2 border-b border-gray-200">
+            <div class="relative">
+              <input type="text" class="w-full p-1 border border-gray-300 rounded-md focus:outline-none focus:ring-transparent"
+                     th:placeholder="${placeholderBusca}" th:name="${nomeAtributo + 'Busca'}" autocomplete="off"
+                     th:hx-get="@{__${urlBusca}__}" th:hx-target="${'#' + nomeAtributo + '-list'}"
+                     hx-trigger="keyup changed delay:500ms" hx-swap="innerHTML" />
+              <div class="absolute inset-y-0 end-0 flex items-center pe-3 pointer-events-none">
+                <svg class="size-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+              </div>
             </div>
           </div>
+          <ul class="options-list max-h-60 overflow-y-auto" th:id="${nomeAtributo + '-list'}"></ul>
         </div>
-        <ul class="options-list max-h-60 overflow-y-auto" th:id="${nomeAtributo + '-list'}">
-        </ul>
       </div>
+
+      <input type="hidden" class="hidden-select-input" th:name="${nomeAtributo}" th:id="${nomeAtributo}" th:value="${valAtributo}" />
     </div>
-    <input type="hidden" class="hidden-select-input" th:name="${nomeAtributo}" th:id="${nomeAtributo}"
-      th:value="${valorAtributo}" />
-    <p th:if="${temErro}" th:each="erro : ${#fields.errors('__${nomeAtributo}__')}" th:text="${erro} + '. '"
-      class="text-sm text-red-600 mt-2"></p>
-  </div>
+  </th:block>
+
+</th:block>
+
+<th:block th:fragment="selectNormal"
+  th:with="
+    validFlag=${isValidado ?: false},
+    disabledFlag=${isDisabled ?: false},
+    placeholder=${textoPlaceholder ?: 'Selecione uma opção'},
+    valAtributo=${valorAtributo ?: null}" 
+  xmlns:th="http://www.thymeleaf.org">
+
+  <th:block th:if="${validFlag}">
+    <div class="w-full mt-6" th:with="temErro=${#fields.hasErrors('__${nomeAtributo}__')}, valorDoObjeto=*{__${nomeAtributo}__}">
+      <label th:for="${nomeAtributo}" th:text="${textoLabel}" th:class="|block font-medium mb-2 ${temErro ? 'text-red-600' : 'text-gray-700'}|"></label>
+      
+      <div class="relative">
+        <select th:id="${nomeAtributo}" th:name="${nomeAtributo}" th:disabled="${disabledFlag}"
+                th:class="|py-3 px-4 block w-full rounded-lg text-base disabled:opacity-50 disabled:pointer-events-none focus:ring-transparent bg-white ${temErro ? 'border-red-300 text-red-600 focus:border-red-500 pe-16' : 'border-gray-300 text-gray-500 focus:border-gray-500 pe-9'}|">
+          
+          <option value="" th:text="${placeholder}"></option>
+          
+          <option th:each="item : ${listaOpcoes}"
+                  th:value="${propValue != null ? item[propValue] : item}"
+                  th:text="${propLabel != null ? item[propLabel] : item}"
+                  th:selected="${valorDoObjeto != null and valorDoObjeto == item}">
+          </option>
+        </select>
+        
+        <div th:if="${temErro}" class="absolute inset-y-0 end-0 flex items-center pointer-events-none pe-8">
+          <svg class="shrink-0 size-4 text-red-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" x2="12" y1="8" y2="12"></line>
+            <line x1="12" x2="12.01" y1="16" y2="16"></line>
+          </svg>
+        </div>
+      </div>
+      
+      <p th:if="${temErro}" th:each="erro : ${#fields.errors('__${nomeAtributo}__')}" th:text="${erro} + '. '" class="text-sm text-red-600 mt-2"></p>
+    </div>
+  </th:block>
+
+  <th:block th:unless="${validFlag}">
+    <div class="w-full mt-6">
+      <label th:for="${nomeAtributo}" th:text="${textoLabel}" class="block font-medium mb-2 text-gray-700"></label>
+      
+      <select th:id="${nomeAtributo}" th:name="${nomeAtributo}" th:disabled="${disabledFlag}"
+              class="py-3 px-4 pe-9 block w-full border-gray-300 text-gray-500 rounded-lg text-base focus:border-gray-500 focus:ring-transparent bg-white disabled:opacity-50 disabled:pointer-events-none">
+        
+        <option value="" th:text="${placeholder}"></option>
+        
+        <option th:each="item : ${listaOpcoes}"
+                th:value="${propValue != null ? item[propValue] : item}"
+                th:text="${propLabel != null ? item[propLabel] : item}"
+                th:selected="${valAtributo != null and (valAtributo == (propValue != null ? item[propValue] : item))}">
+        </option>
+      </select>
+    </div>
+  </th:block>
+
 </th:block>

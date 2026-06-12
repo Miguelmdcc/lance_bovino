@@ -31,8 +31,7 @@ public class Usuario implements Serializable {
 	private BankMethod metodo_bancario;
 	@Column(name = "dados_bancarios")
 	private String dadosBancarios;
-	@Enumerated(EnumType.STRING)
-    private Status status = Status.ATIVO;
+	private boolean ativo;
 	
 	public Long getCodigo() {
 		return codigo;
@@ -64,17 +63,17 @@ public class Usuario implements Serializable {
 	public void setDadosBancarios(String dadosBancarios) {
 		this.dadosBancarios = dadosBancarios;
 	}
-	public Status getStatus() {
-		return status;
+	public boolean getAtivo() {
+		return ativo;
 	}
-	public void setStatus(Status status) {
-		this.status = status;
+	public void setAtivo(boolean ativo) {
+		this.ativo = ativo;
 	}
 
 	@Override
 	public String toString() {
 		return "User [codigo=" + codigo + ", nome=" + nome + ", cpf=" + cpf + ", metodo_bancario=" + metodo_bancario
-				+ ", dadosBancarios=" + dadosBancarios + ", status=" + status + "]";
+				+ ", dadosBancarios=" + dadosBancarios + ", ativo=" + ativo + "]";
 	}
 	
 }

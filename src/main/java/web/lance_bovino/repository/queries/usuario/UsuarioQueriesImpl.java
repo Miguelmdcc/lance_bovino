@@ -29,9 +29,9 @@ public class UsuarioQueriesImpl implements UsuarioQueries {
 		preencherCondicoesEParametros(filtro, condicoes, parametros);
 
 		if (condicoes.isEmpty()) {
-			condicoes.append(" where u.status = 'ATIVO'");
+			condicoes.append(" where u.ativo = true");
 		} else {
-			condicoes.append(" and u.status = 'ATIVO'");
+			condicoes.append(" and u.ativo = true");
 		}
 
 		queryUsuarios.append(condicoes);

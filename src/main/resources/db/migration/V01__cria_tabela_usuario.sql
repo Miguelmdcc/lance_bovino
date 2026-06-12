@@ -8,7 +8,7 @@ CREATE TABLE public.usuario
     metodo_bancario text,
     dados_bancarios text,
     senha text,
-    status text DEFAULT 'ATIVO',
+    ativo boolean DEFAULT true,
     PRIMARY KEY (codigo)
 );
 

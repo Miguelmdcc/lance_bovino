@@ -37,9 +37,9 @@ public class SecurityConfig {
                 .permitAll()
                 // Um usuário autenticado e com o papel ADMIN pode fazer requisições para
                 // essas URLs
-                .requestMatchers("/vacina/cadastrar").hasRole("ADMIN")
-                .requestMatchers("/usuario/cadastrar").hasRole("ADMIN")
-                .requestMatchers("/relatorios/todasvacinas").hasRole("ADMIN")
+                .requestMatchers("/gado/cadastrar").hasAnyRole("ADMIN", "USUARIO")
+                // .requestMatchers("/usuario/cadastrar").hasRole("ADMIN")
+                // .requestMatchers("/relatorios/todasvacinas").hasRole("ADMIN")
                 // .requestMatchers("URL").hasAnyRole("ADMIN", // "USUARIO")
                 .anyRequest().permitAll()).formLogin(form -> form
                         // Uma página de login customizada
@@ -97,9 +97,9 @@ public class SecurityConfig {
     public UserDetailsService userDetailsService(DataSource dataSource) {
         JdbcUserDetailsManager manager = new JdbcUserDetailsManager(dataSource);
         manager.setUsersByUsernameQuery(
-                "select nome_usuario, senha, ativo " + "from usuario " + "where nome_usuario = ?");
-        manager.setAuthoritiesByUsernameQuery("SELECT tab.nome_usuario , papel.nome FROM"
-                + "(SELECT usuario.nome_usuario , usuario.codigo FROM usuario WHERE nome_usuario = ?) as tab "
+                "select nome, senha, ativo " + "from usuario " + "where nome = ?");
+        manager.setAuthoritiesByUsernameQuery("SELECT tab.nome , papel.nome FROM"
+                + "(SELECT usuario.nome , usuario.codigo FROM usuario WHERE nome = ?) as tab "
                 + " INNER JOIN usuario_papel ON codigo_usuario = tab.codigo "
                 + " INNER JOIN papel ON codigo_papel = papel.codigo;");
         return manager;

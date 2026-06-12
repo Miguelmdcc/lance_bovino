@@ -489,6 +489,9 @@
   .animate-spin {
     animation: var(--animate-spin);
   }
+  .cursor-default {
+    cursor: default;
+  }
   .cursor-pointer {
     cursor: pointer;
   }
@@ -565,6 +568,11 @@
   }
   .self-end {
     align-self: flex-end;
+  }
+  .truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .overflow-hidden {
     overflow: hidden;
@@ -773,10 +781,6 @@
     font-size: var(--text-2xl);
     line-height: var(--tw-leading, var(--text-2xl--line-height));
   }
-  .text-3xl {
-    font-size: var(--text-3xl);
-    line-height: var(--tw-leading, var(--text-3xl--line-height));
-  }
   .text-base {
     font-size: var(--text-base);
     line-height: var(--tw-leading, var(--text-base--line-height));
@@ -859,6 +863,9 @@
   }
   .uppercase {
     text-transform: uppercase;
+  }
+  .italic {
+    font-style: italic;
   }
   .ordinal {
     --tw-ordinal: ordinal;

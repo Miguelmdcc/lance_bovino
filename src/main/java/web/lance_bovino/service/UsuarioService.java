@@ -7,7 +7,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import web.lance_bovino.filter.UsuarioFilter;
-import web.lance_bovino.model.Status;
 import web.lance_bovino.model.Usuario;
 import web.lance_bovino.repository.UsuarioRepository;
 
@@ -54,6 +53,6 @@ public class UsuarioService {
     @Transactional(readOnly = true)
     public Usuario buscar(Long codigo) {
         logger.info("Buscando o usuário com código: {}", codigo);
-        return pessoaRepository.findByCodigoAndStatus(codigo, Status.ATIVO).orElse(null);
+        return pessoaRepository.findByCodigoAndAtivo(codigo, true).orElse(null);
     }
 } 

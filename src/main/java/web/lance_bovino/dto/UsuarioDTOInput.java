@@ -23,7 +23,7 @@ public class UsuarioDTOInput {
     private BankMethod metodoBancario;
     @NotBlank(message = "Os dados bancários são obrigatórios")
     private String dadosBancarios;
-    private Status status = Status.ATIVO;
+    private boolean ativo = true;
 
     public Long getCodigo() {
         return codigo;
@@ -65,13 +65,12 @@ public class UsuarioDTOInput {
         this.dadosBancarios = dadosBancarios;
     }
 
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
+	public boolean getAtivo() {
+		return ativo;
+	}
+	public void setAtivo(boolean ativo) {
+		this.ativo = ativo;
+	}
 
     public Usuario toUser() {
         Usuario user = new Usuario();
@@ -80,7 +79,7 @@ public class UsuarioDTOInput {
         user.setCpf(cpf);
         user.setMetodoBancario(metodoBancario);
         user.setDadosBancarios(dadosBancarios);
-        user.setStatus(status);
+        user.setAtivo(ativo);;
         return user;
     }
 
@@ -91,14 +90,14 @@ public class UsuarioDTOInput {
         dto.setCpf(usuario.getCpf());
         dto.setMetodoBancario(usuario.getMetodoBancario());
         dto.setDadosBancarios(usuario.getDadosBancarios());
-        dto.setStatus(usuario.getStatus());
+        dto.setAtivo(usuario.getAtivo());
         return dto;
     }
 
     @Override
     public String toString() {
         return "UsuarioDTOInput [codigo=" + codigo + ", nome=" + nome + ", cpf=" + cpf + ", metodoBancario="
-                + metodoBancario + ", dadosBancarios=" + dadosBancarios + ", status=" + status + "]";
+                + metodoBancario + ", dadosBancarios=" + dadosBancarios + ", ativo=" + ativo + "]";
     }
 
 }
