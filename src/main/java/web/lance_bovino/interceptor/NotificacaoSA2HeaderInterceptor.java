@@ -3,17 +3,17 @@ package web.lance_bovino.interceptor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
-import web.lance_bovino.notification.NotificacaoSweetAlert2;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import tools.jackson.databind.ObjectMapper;
+import web.lance_bovino.notification.NotificacaoSweetAlert2;
 
 @Component
-public class NotificacaoHeaderInterceptor implements HandlerInterceptor {
+public class NotificacaoSA2HeaderInterceptor implements HandlerInterceptor {
 
     private final ObjectMapper objectMapper;
 
-    public NotificacaoHeaderInterceptor(ObjectMapper objectMapper) {
+    public NotificacaoSA2HeaderInterceptor(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
@@ -22,20 +22,16 @@ public class NotificacaoHeaderInterceptor implements HandlerInterceptor {
             ModelAndView modelAndView) throws Exception {
 
         if (modelAndView != null && modelAndView.getModel() != null) {
-            Object notificacaoObj = modelAndView.getModel().get("notificacao");
+            Object notificacaoObj = modelAndView.getModel().get("notificacaoSA2");
 
             if (notificacaoObj instanceof NotificacaoSweetAlert2) {
-                NotificacaoSweetAlert2 notificacao = (NotificacaoSweetAlert2) notificacaoObj;
-
+                NotificacaoSweetAlert2 notificacaoSA2 = (NotificacaoSweetAlert2) notificacaoObj;
+                
                 // Estrutura do evento: {"exibirAlerta": { ... dados ... }}
-                String jsonDados = objectMapper.writeValueAsString(notificacao);
+                String jsonDados = objectMapper.writeValueAsString(notificacaoSA2);
                 String headerValue = "{\"exibirAlerta\": " + jsonDados + "}";
 
                 response.addHeader("HX-Trigger", headerValue);
-
-                // Opcional: remover do model para não sujar a view (se ainda houvesse
-                // fragmentos)
-                // modelAndView.getModel().remove("notificacao");
             }
         }
     }
