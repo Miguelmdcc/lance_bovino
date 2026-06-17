@@ -22,7 +22,7 @@ public class CPFUnicoServiceImpl implements CPFUnicoService {
 			throw new UnsupportedOperationException("A anotação deveria ser usada no atributo cpf");
 		}
 
-		Usuario novo = ((UsuarioDTOInput) value).toUser();
+		Usuario novo = ((UsuarioDTOInput) value).toUsuario();
 		//A validacao "foi preenchido um cpf" nao eh obrigacao dessa verificacao
 		if (novo.getCpf() == null || novo.getCpf().isBlank()) {
 			return true;
