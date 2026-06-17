@@ -60,6 +60,7 @@ public class UsuarioController {
 			return "usuario/cadastrar :: formulario";
 		} else {
 			usuario.setAtivo(true);
+			logger.info("senha: ", usuario.getSenha());
 			usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
 			cadastroUsuarioService.salvar(usuario.toUsuario());
 			redirectAttributes.addFlashAttribute("notificacaoSA2", new NotificacaoSweetAlert2("Cadastro de usuário efetuado com sucesso.",

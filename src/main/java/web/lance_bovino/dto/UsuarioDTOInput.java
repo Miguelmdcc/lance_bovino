@@ -106,6 +106,7 @@ public class UsuarioDTOInput {
         user.setCpf(cpf);
         user.setMetodoBancario(metodoBancario);
         user.setDadosBancarios(dadosBancarios);
+        user.setSenha(senha);
         user.setAtivo(ativo);
         user.setPapeis(papeis);
         return user;
@@ -118,6 +119,7 @@ public class UsuarioDTOInput {
         dto.setCpf(usuario.getCpf());
         dto.setMetodoBancario(usuario.getMetodoBancario());
         dto.setDadosBancarios(usuario.getDadosBancarios());
+        dto.setSenha(usuario.getSenha());
         dto.setAtivo(usuario.isAtivo());
         dto.setPapeis(usuario.getPapeis());
         return dto;
@@ -125,8 +127,9 @@ public class UsuarioDTOInput {
 
     @Override
     public String toString() {
-        return "UsuarioDTOInput [codigo=" + codigo + ", nome=" + nome + ", cpf=" + cpf + ", metodoBancario="
-                + metodoBancario + ", dadosBancarios=" + dadosBancarios + ", ativo=" + ativo + "]";
+        return "UsuarioDTOInput [codigo=" + codigo + ", nome=" + nome + ", cpf=" + cpf
+                + ", metodoBancario=" + metodoBancario + ", dadosBancarios=" + dadosBancarios
+                + ", senha=" + senha + ", ativo=" + ativo + ", papeis=" + papeis + "]";
     }
 
 }
