@@ -2,23 +2,29 @@
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 
 
-<div data-th-fragment="menu" class="space-y-4">
+<div data-th-fragment="menu" class="space-y-4" th:fragment="menu" id="menu"
+      hx-get="/layout/menu-atualizado" hx-trigger="atualizarAuth from:body" hx-target="this">
+      
+  <div x-data="{ open: false }" sec:authorize="isAuthenticated()" id="usuariologinlogout"
+        hx-get="/layout/menu-atualizado" hx-trigger="atualizarAuth from:body" hx-target="this">
 
-  <!-- 1o Item Menu -->
-  <div x-data="{ open: false }">
-    <button th:replace="~{components/menu-item-button :: menu-item-button('Gado', ~{::#boi-icon})}"></button>
+    <!-- 1o Item Menu -->
+    <div x-data="{ open: false }">
+      <button th:replace="~{components/menu-item-button :: menu-item-button('Gado', ~{::#boi-icon})}"></button>
 
-    <!-- Opcoes do 1o Item Menu -->
-    <div x-show="open" class="space-y-4 ps-10">
-      <!-- 1a Opcao -->
-      <div
-        th:replace="~{components/menu-item-option :: menu-item-option('Cadastrar', @{/gado/cadastrar}, ~{::#cadastrar-icon})}">
-      </div>
-      <!-- 2a Opcao -->
-      <div
-        th:replace="~{components/menu-item-option :: menu-item-option('Pesquisar', @{/gado/abrirpesquisar}, ~{::#pesquisar-icon})}">
+      <!-- Opcoes do 1o Item Menu -->
+      <div x-show="open" class="space-y-4 ps-10">
+        <!-- 1a Opcao -->
+        <div
+          th:replace="~{components/menu-item-option :: menu-item-option('Cadastrar', @{/gado/cadastrar}, ~{::#cadastrar-icon})}">
+        </div>
+        <!-- 2a Opcao -->
+        <div
+          th:replace="~{components/menu-item-option :: menu-item-option('Pesquisar', @{/gado/abrirpesquisar}, ~{::#pesquisar-icon})}">
+        </div>
       </div>
     </div>
+
   </div>
 
 </div>
