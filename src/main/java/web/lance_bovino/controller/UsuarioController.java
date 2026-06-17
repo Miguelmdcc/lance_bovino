@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.validation.Valid;
+import web.lance_bovino.dto.UsuarioAdminDTOInput;
 import web.lance_bovino.dto.UsuarioDTOInput;
 import web.lance_bovino.model.BankMethod;
 import web.lance_bovino.model.Papel;
@@ -68,15 +69,35 @@ public class UsuarioController {
 			return "redirect:/usuario/cadastrar";
 		}
 	}
+
+	@GetMapping("/cadastrar_admin")
+	public String abrirCadastroUsuarioAdmin(UsuarioAdminDTOInput usuario, Model model) {
+		List<Papel> papeis = papelRepository.findAll();
+		model.addAttribute("todosPapeis", papeis);
+		model.addAttribute("metodosBancarios", BankMethod.values());
+		return "usuario/cadastrar_admin :: formulario";
+	}
 	
-	// @GetMapping("/cadastrosucesso")
-	// public String mostrarCadastroSucesso(String mensagem, Usuario usuario, Model model) {
-	// 	List<Papel> papeis = papelRepository.findAll();
-	// 	model.addAttribute("todosPapeis", papeis);
-	// 	if (mensagem != null && !mensagem.isEmpty()) {
-    //         model.addAttribute("notificacaoSA2", new NotificacaoSweetAlert2(mensagem,
-    //                 TipoNotificaoSweetAlert2.SUCCESS, 4000));
-    //     }
-	// 	return "usuario/cadastrar :: formulario";
-	// }
+	@PostMapping("/cadastrar_admin")
+	public String cadastrarNovoUsuarioAdmin(@Valid UsuarioAdminDTOInput usuario, BindingResult resultado, Model model, RedirectAttributes redirectAttributes) {
+		if (resultado.hasErrors()) {
+			logger.info("O usuario recebido para cadastrar não é válido.");
+			logger.info("Erros encontrados:");
+			for (FieldError erro : resultado.getFieldErrors()) {
+				logger.info("{}", erro);
+			}
+			List<Papel> papeis = papelRepository.findAll();
+			model.addAttribute("todosPapeis", papeis);
+			model.addAttribute("metodosBancarios", BankMethod.values());
+			return "usuario/cadastrar_admin :: formulario";
+		} else {
+			usuario.setAtivo(true);
+			usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
+			cadastroUsuarioService.salvar(usuario.toUsuario());
+			redirectAttributes.addFlashAttribute("notificacaoSA2", new NotificacaoSweetAlert2("Cadastro de usuário efetuado com sucesso.",
+                    TipoNotificaoSweetAlert2.SUCCESS, 4000));
+			return "redirect:/usuario/cadastrar_admin";
+		}
+	}
+
 }
