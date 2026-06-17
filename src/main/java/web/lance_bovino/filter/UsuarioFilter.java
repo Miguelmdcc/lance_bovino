@@ -7,8 +7,9 @@ public class UsuarioFilter {
 	private Long codigo;
 	private String nome;
 	private String cpf;
-	private BankMethod metodo_bancario;
-	private Long dadosBancarios;
+	private BankMethod metodoBancario;
+	private String dadosBancarios;
+    private boolean ativo;
 
     public Long getCodigo() {
         return codigo;
@@ -28,24 +29,30 @@ public class UsuarioFilter {
     public void setCpf(String cpf) {
         this.cpf = cpf;
     }
-    public BankMethod getMetodo_bancario() {
-        return metodo_bancario;
+    public BankMethod getMetodoBancario() {
+        return metodoBancario;
     }
-    public void setMetodo_bancario(BankMethod metodo_bancario) {
-        this.metodo_bancario = metodo_bancario;
+    public void setMetodoBancario(BankMethod metodoBancario) {
+        this.metodoBancario = metodoBancario;
     }
-    public Long getDadosBancarios() {
+    public String getDadosBancarios() {
         return dadosBancarios;
     }
-    public void setDadosBancarios(Long dadosBancarios) {
+    public void setDadosBancarios(String dadosBancarios) {
         this.dadosBancarios = dadosBancarios;
+    }
+    public boolean isAtivo() {
+        return ativo;
+    }
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
     }
 
     @Override
     public String toString() {
         return "UsuarioFilter [codigo=" + codigo + ", nome=" + nome + ", cpf=" + cpf
-                + ", metodo_bancario=" + metodo_bancario + ", dadosBancarios=" + dadosBancarios
-                + "]";
+                + ", metodoBancario=" + metodoBancario + ", dadosBancarios=" + dadosBancarios
+                + ", ativo=" + ativo + "]";
     }
 
 }

@@ -9,8 +9,13 @@
 
 <body>
   <!-- conteudo principal -->
-  <main layout:fragment="conteudo" id="main" class="flex flex-col align-middle justify-center w-full m-10">
-    <h1 class="text-2xl md:text-4xl text-center">Bem vindo ao Lance Bovino, seu app de Leilão de Gados!</h1>
+  <main layout:fragment="conteudo" th:fragment="conteudo" id="main" class="flex flex-col align-middle justify-center w-full m-10">
+    <div x-data="{ open: false }" sec:authorize="isAuthenticated()">
+      <h1 class="text-2xl md:text-4xl text-center">Bem vindo <span sec:authentication="principal.username"></span>, ao seu app de Leilão de Gados!</h1>
+    </div>
+    <div x-data="{ open: false }" sec:authorize="isAnonymous()">
+      <h1 class="text-2xl md:text-4xl text-center">Bem vindo ao Lance Bovino, seu app de Leilão de Gados!</h1>
+    </div>
     <!-- <img th:src="@{/images/ze-gotinha.jpg}" class="mt-10 mx-auto block" alt="Zé Gotinha" /> -->
   </main>
   <!-- !conteudo principal -->

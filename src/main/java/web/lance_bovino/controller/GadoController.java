@@ -57,12 +57,12 @@ public class GadoController {
     }
 
     @GetMapping("/gado/cadastrar")
-    public String abrirCadastro(GadoDTOInput dto) {
+    public String abrirCadastro(GadoDTOInput gadoDTOInput) {
         return "gado/cadastrar :: formulario";
     }
 
     @PostMapping("/gado/cadastrar")
-    public String cadastrar(@Valid GadoDTOInput dto, BindingResult resultado,
+    public String cadastrar(@Valid GadoDTOInput gadoDTOInput, BindingResult resultado,
             RedirectAttributes atributos) {
         if (resultado.hasErrors()) {
             logger.info("O gado recebido para cadastrar não é válido.");
@@ -75,7 +75,7 @@ public class GadoController {
             }
             return "gado/cadastrar :: formulario";
         } else {
-            gadoService.salvar(dto.toGado());
+            gadoService.salvar(gadoDTOInput.toGado());
             atributos.addFlashAttribute("notificacao", new NotificacaoSweetAlert2(
                     "Gado cadastrado com sucesso!", TipoNotificaoSweetAlert2.SUCCESS, 4000));
             return "redirect:/gado/cadastrar";

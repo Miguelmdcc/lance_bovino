@@ -1,4 +1,4 @@
-class AppLanceBovino {
+class AppVacinacao {
 
     static CONFIG = {
         seletores: {
@@ -9,6 +9,7 @@ class AppLanceBovino {
             cpf: ".componentecpf",
             confirm: "[hx-confirm]:not([data-confirm-ready])",
             buscaContainer: ".searchable-select-container:not([data-initialized])",
+            senha: ".toggle-senha",
         },
         maskMoney: {
             prefix: "",
@@ -69,6 +70,8 @@ class AppLanceBovino {
         this.prepararConfirmacoes(container);
         this.prepararBusca(container);
         this.prepararCpf(container);
+        this.prepararSenha(container);
+        this.prepararNumero(container);
     }
 
     static lerCsrfDoHTML() {
@@ -255,15 +258,76 @@ class AppLanceBovino {
         console.log(`[DEBUG] prepararHora encontrou ${inputs.length} elementos.`);
 
         inputs.forEach((input) => {
+            let apagando = false;
+
+            // 1. Lógica de Máscara (Teclado)
+            input.addEventListener("keydown", (e) => {
+                apagando = e.key === "Backspace";
+            });
+
+            input.addEventListener("input", (e) => {
+                if (apagando) return;
+
+                let v = e.target.value.replace(/\D/g, "");
+
+                if (v.length > 2) {
+                    v = v.substring(0, 2) + ":" + v.substring(2, 4);
+                }
+
+                e.target.value = v;
+            });
+
             input.classList.remove("componentehora");
+            input.setAttribute("placeholder", "HH:MM");
+            input.setAttribute("maxlength", "5");
+
+            // 2. Acoplando o relógio visual
             if (typeof mdDateTimePicker !== 'undefined') {
+                const btnId = "btn-" + input.id;
+                const btn = (container.querySelector ? container.querySelector("#" + btnId) : null)
+                    || document.getElementById(btnId);
+
                 const dialog = new mdDateTimePicker.default({
                     type: "time", mode: true, inner24: true, cancel: this.CONFIG.texto.cancelar,
                 });
-                input.addEventListener("click", () => dialog.toggle());
+
+                const sincronizarRelogio = () => {
+                    if (input.value && input.value.length === 5) {
+                        // Validação básica para evitar que o relógio quebre com horas bizarras (ex: 99:99)
+                        const partes = input.value.split(':');
+                        const h = parseInt(partes[0], 10);
+                        const m = parseInt(partes[1], 10);
+
+                        if (h >= 0 && h <= 23 && m >= 0 && m <= 59) {
+                            if (typeof moment !== 'undefined') {
+                                // Atualiza o objeto Moment interno da biblioteca
+                                dialog.time = moment(input.value, "HH:mm");
+                            }
+                        }
+                    }
+                };
+
+                if (btn) {
+                    btn.addEventListener("click", (e) => {
+                        e.preventDefault();
+                        sincronizarRelogio(); // <--- Lê a hora digitada antes de abrir
+                        dialog.toggle();
+                    });
+
+                    btn.addEventListener("keydown", (e) => {
+                        if (e.key === " " || e.key === "Enter") {
+                            e.preventDefault();
+                            sincronizarRelogio(); // <--- Lê a hora digitada antes de abrir
+                            dialog.toggle();
+                        }
+                    });
+                }
+
                 dialog.trigger = input;
+
                 input.addEventListener("onOk", () => {
                     input.value = dialog.time.format("HH:mm");
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
                 });
             }
         });
@@ -306,6 +370,104 @@ class AppLanceBovino {
         });
     }
 
+    static prepararSenha(container = document) {
+        let botoes = container.querySelectorAll(this.CONFIG.seletores.senha);
+        if (container.matches && container.matches(this.CONFIG.seletores.senha)) {
+            botoes = [container];
+        }
+
+        botoes.forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                e.preventDefault();
+
+                // 1. Acha o container relative pai
+                const containerRelativo = btn.closest(".relative");
+
+                // 2. Acha o input de texto/senha (ignorando o hidden)
+                const input = containerRelativo.querySelector("input:not([type='hidden'])");
+
+                // 3. Acha os ícones
+                const olhoAberto = btn.querySelector(".icone-olho-aberto");
+                const olhoFechado = btn.querySelector(".icone-olho-fechado");
+
+                // 4. Faz a troca lógica (Toggle)
+                if (input.type === "password") {
+                    input.type = "text";
+                    olhoFechado.classList.add("hidden");
+                    olhoAberto.classList.remove("hidden");
+                } else {
+                    input.type = "password";
+                    olhoAberto.classList.add("hidden");
+                    olhoFechado.classList.remove("hidden");
+                }
+            });
+        });
+    }
+
+    static prepararNumero(container = document) {
+        const inputs = container.querySelectorAll(".input-numero");
+
+        inputs.forEach(input => {
+            const isDecimal = input.dataset.decimal === "true";
+            const showGroups = input.dataset.groups === "true";
+
+            // Formatação inicial quando a página carrega
+            const formatar = (valor) => {
+                if (!valor) return "";
+                let v = valor.toString();
+
+                // 1. O valor já veio com vírgula do Spring (ex: 1.234,56)?
+                if (v.includes(',')) {
+                    // Remove todos os pontos de milhar para recalcular depois
+                    v = v.replace(/\./g, "");
+                }
+                // 2. O valor veio "cru" do Java (ex: 1234.56)?
+                else if (isDecimal && v.includes('.')) {
+                    // Troca o ponto decimal por vírgula
+                    v = v.replace('.', ',');
+                }
+
+                // Remove qualquer lixo que tenha sobrado, deixando só números e vírgula
+                v = v.replace(/[^0-9,]/g, "");
+
+                // Reaplica a máscara de grupos (pontos de milhar)
+                if (showGroups) {
+                    let partes = v.split(',');
+                    partes[0] = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                    v = partes.join(',');
+                }
+
+                return v;
+            };
+
+            if (input.value) {
+                input.value = formatar(input.value);
+            }
+
+            // Máscara enquanto o aluno digita
+            input.addEventListener("input", (e) => {
+                let v = e.target.value.replace(/[^0-9,]/g, ""); // Permite só números e vírgula
+
+                // Impede mais de uma vírgula
+                if ((v.match(/,/g) || []).length > 1) {
+                    v = v.substring(0, v.lastIndexOf(','));
+                }
+
+                // Se não for decimal, remove qualquer vírgula que tenha passado
+                if (!isDecimal) {
+                    v = v.replace(/,/g, "");
+                }
+
+                if (showGroups) {
+                    let partes = v.split(',');
+                    partes[0] = partes[0].replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                    v = partes.join(',');
+                }
+                e.target.value = v;
+            });
+        });
+    }
+
     static prepararConfirmacoes(container = document) {
         let elementos = container.querySelectorAll(this.CONFIG.seletores.confirm);
         if (container.matches && container.matches(this.CONFIG.seletores.confirm)) {
@@ -322,12 +484,12 @@ class AppLanceBovino {
     static _dispararSweetAlert(e) {
         e.preventDefault();
         Swal.fire({
-            title: AppLanceBovino.CONFIG.texto.tituloConfirm,
+            title: AppVacinacao.CONFIG.texto.tituloConfirm,
             text: e.detail.question,
             icon: "warning",
             showCancelButton: true,
-            cancelButtonText: AppLanceBovino.CONFIG.texto.cancelar,
-            confirmButtonText: AppLanceBovino.CONFIG.texto.remover,
+            cancelButtonText: AppVacinacao.CONFIG.texto.cancelar,
+            confirmButtonText: AppVacinacao.CONFIG.texto.remover,
             confirmButtonColor: "#3085d6",
         }).then((result) => {
             if (result.isConfirmed) {
@@ -399,12 +561,14 @@ class AppLanceBovino {
                 optionsList.addEventListener("click", (event) => {
                     const option = event.target.closest("li");
                     if (option) {
-                        if (selectedValueSpan) selectedValueSpan.textContent = option.textContent.trim();
+                        if (selectedValueSpan) {
+                            selectedValueSpan.textContent = option.dataset.text || option.textContent.trim();
+                        }
                         if (hiddenInput) hiddenInput.value = option.dataset.value;
                         if (dropdown) dropdown.classList.add("hidden");
                         const trigger = container.querySelector(".custom-select-trigger");
                         if (trigger) {
-                            AppLanceBovino._removeFocus(trigger);
+                            AppVacinacao._removeFocus(trigger);
                         }
                     }
                 });
@@ -414,4 +578,4 @@ class AppLanceBovino {
 }
 
 // Inicialização automática
-document.addEventListener("DOMContentLoaded", () => AppLanceBovino.init());
+document.addEventListener("DOMContentLoaded", () => AppVacinacao.init());

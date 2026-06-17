@@ -29,6 +29,9 @@
           <a th:hx-get="@{/login}" hx-target="#main" hx-swap="outerHTML" hx-push-url="true"
             class="ml-5 rounded-lg border-2 border-gray-600 bg-gray-600 px-8 py-2 text-white shadow-md hover:bg-white hover:text-gray-600">
             Login </a>
+          <a th:hx-get="@{/usuario/cadastrar}" hx-target="#main" hx-swap="outerHTML" hx-push-url="true"
+          class="ml-5 rounded-lg border-2 border-gray-600 bg-gray-600 px-8 py-2 text-white shadow-md hover:bg-white hover:text-gray-600">
+          Cadastrar </a>
         </div>
         <!-- nome do usuario -->
         <div sec:authorize="isAuthenticated()">

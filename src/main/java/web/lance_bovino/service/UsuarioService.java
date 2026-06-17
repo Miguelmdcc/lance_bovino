@@ -2,12 +2,9 @@ package web.lance_bovino.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import web.lance_bovino.filter.UsuarioFilter;
-import web.lance_bovino.model.Status;
+
 import web.lance_bovino.model.Usuario;
 import web.lance_bovino.repository.UsuarioRepository;
 
@@ -16,44 +13,44 @@ public class UsuarioService {
 
     private static final Logger logger = LoggerFactory.getLogger(UsuarioService.class); 
 
-    private UsuarioRepository pessoaRepository;
+    private UsuarioRepository usuarioRepository;
 
-    public UsuarioService(UsuarioRepository pessoaRepository) {
-        this.pessoaRepository = pessoaRepository;
+    public UsuarioService(UsuarioRepository usuarioRepository) {
+        this.usuarioRepository = usuarioRepository;
     }
 
-    @Transactional(readOnly = true)
-    public Page<Usuario> pesquisar(UsuarioFilter filtro, Pageable pageable) {
-        logger.info("Pesquisando usuários com o filtro {}", filtro);
-        return pessoaRepository.pesquisar(filtro, pageable);
-    }
+    // @Transactional(readOnly = true)
+    // public Page<Usuario> pesquisar(UsuarioFilter filtro, Pageable pageable) {
+    //     logger.info("Pesquisando usuários com o filtro {}", filtro);
+    //     return usuarioRepository.pesquisar(filtro, pageable);
+    // }
 
     @Transactional(readOnly = true)
     public Usuario buscarPeloCPF(String cpf) {
-        return pessoaRepository.findByCpf(cpf);
+        return usuarioRepository.findByCpf(cpf);
     }
 
     @Transactional 
     public void salvar(Usuario pessoa) { 
         logger.info("Salvando pessoa: {}", pessoa); 
-        pessoaRepository.save(pessoa); 
+        usuarioRepository.save(pessoa); 
     } 
 
     @Transactional 
     public void atualizar(Usuario pessoa) { 
         logger.info("Atualizando pessoa: {}", pessoa); 
-        pessoaRepository.save(pessoa); 
+        usuarioRepository.save(pessoa); 
     } 
 
     @Transactional 
     public void remover(Long codigo) { 
         logger.info("Removendo pessoa com código: {}", codigo); 
-        pessoaRepository.deleteById(codigo); 
+        usuarioRepository.deleteById(codigo); 
     } 
 
     @Transactional(readOnly = true)
     public Usuario buscar(Long codigo) {
         logger.info("Buscando o usuário com código: {}", codigo);
-        return pessoaRepository.findByCodigoAndStatus(codigo, Status.ATIVO).orElse(null);
+        return usuarioRepository.findByCodigoAndAtivo(codigo, true).orElse(null);
     }
 } 

@@ -29,9 +29,9 @@ public class UsuarioQueriesImpl implements UsuarioQueries {
 		preencherCondicoesEParametros(filtro, condicoes, parametros);
 
 		if (condicoes.isEmpty()) {
-			condicoes.append(" where u.status = 'ATIVO'");
+			condicoes.append(" where u.ativo = true");
 		} else {
-			condicoes.append(" and u.status = 'ATIVO'");
+			condicoes.append(" and u.ativo = true");
 		}
 
 		queryUsuarios.append(condicoes);
@@ -68,10 +68,10 @@ public class UsuarioQueriesImpl implements UsuarioQueries {
 			condicao = true;
 		}
 
-		if (filtro.getMetodo_bancario() != null) {
+		if (filtro.getMetodoBancario() != null) {
 			PaginacaoUtil.fazerLigacaoCondicoes(condicoes, condicao);
-			condicoes.append("u.metodo_bancario = :metodo_bancario");
-			parametros.put("metodo_bancario", filtro.getMetodo_bancario());
+			condicoes.append("u.metodoBancario = :metodoBancario");
+			parametros.put("metodoBancario", filtro.getMetodoBancario());
 			condicao = true;
 		}
 
