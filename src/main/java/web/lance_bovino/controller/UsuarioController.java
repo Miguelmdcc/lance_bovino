@@ -1,5 +1,6 @@
 package web.lance_bovino.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,8 +41,6 @@ public class UsuarioController {
 
 	@GetMapping("/cadastrar")
 	public String abrirCadastroUsuario(UsuarioDTOInput usuario, Model model) {
-		List<Papel> papeis = papelRepository.findAll();
-		model.addAttribute("todosPapeis", papeis);
 		model.addAttribute("metodosBancarios", BankMethod.values());
 		return "usuario/cadastrar :: formulario";
 	}
@@ -54,13 +53,14 @@ public class UsuarioController {
 			for (FieldError erro : resultado.getFieldErrors()) {
 				logger.info("{}", erro);
 			}
-			List<Papel> papeis = papelRepository.findAll();
-			model.addAttribute("todosPapeis", papeis);
 			model.addAttribute("metodosBancarios", BankMethod.values());
 			return "usuario/cadastrar :: formulario";
 		} else {
+			Papel usuario_papel = papelRepository.findByNome("ROLE_USUARIO");
+			List<Papel> papeis = new ArrayList<>();
+			papeis.add(usuario_papel);
+			usuario.setPapeis(papeis);
 			usuario.setAtivo(true);
-			logger.info("senha: ", usuario.getSenha());
 			usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
 			cadastroUsuarioService.salvar(usuario.toUsuario());
 			redirectAttributes.addFlashAttribute("notificacaoSA2", new NotificacaoSweetAlert2("Cadastro de usuário efetuado com sucesso.",

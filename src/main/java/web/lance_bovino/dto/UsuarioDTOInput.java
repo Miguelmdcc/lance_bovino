@@ -32,7 +32,7 @@ public class UsuarioDTOInput {
     @Size(min = 5, max = 255, message = "A senha deve ter entre 5 e 255 caracteres")
     private String senha;
     private boolean ativo = true;
-    @Size(min = 1, message = "Ao menos um papel é obrigatório")
+    // @Size(min = 1, message = "Ao menos um papel é obrigatório")
     private List<Papel> papeis = new ArrayList<>();
 
     public Long getCodigo() {
