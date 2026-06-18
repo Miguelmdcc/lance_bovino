@@ -31,20 +31,20 @@ public class UsuarioService {
     }
 
     @Transactional 
-    public void salvar(Usuario pessoa) { 
-        logger.info("Salvando pessoa: {}", pessoa); 
-        usuarioRepository.save(pessoa); 
+    public void salvar(Usuario usuario) { 
+        logger.info("Salvando usuario: {}", usuario); 
+        usuarioRepository.save(usuario); 
     } 
 
     @Transactional 
-    public void atualizar(Usuario pessoa) { 
-        logger.info("Atualizando pessoa: {}", pessoa); 
-        usuarioRepository.save(pessoa); 
+    public void atualizar(Usuario usuario) { 
+        logger.info("Atualizando usuario: {}", usuario); 
+        usuarioRepository.save(usuario); 
     } 
 
     @Transactional 
     public void remover(Long codigo) { 
-        logger.info("Removendo pessoa com código: {}", codigo); 
+        logger.info("Removendo usuario com código: {}", codigo); 
         usuarioRepository.deleteById(codigo); 
     } 
 

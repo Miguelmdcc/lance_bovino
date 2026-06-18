@@ -2,8 +2,15 @@ package web.lance_bovino.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,15 +20,20 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import web.lance_bovino.dto.UsuarioAdminDTOInput;
 import web.lance_bovino.dto.UsuarioDTOInput;
 import web.lance_bovino.model.BankMethod;
 import web.lance_bovino.model.Papel;
+import web.lance_bovino.model.Usuario;
 import web.lance_bovino.notification.NotificacaoSweetAlert2;
 import web.lance_bovino.notification.TipoNotificaoSweetAlert2;
 import web.lance_bovino.repository.PapelRepository;
-import web.lance_bovino.service.CadastroUsuarioService;
+import web.lance_bovino.repository.UsuarioRepository;
+import web.lance_bovino.service.UsuarioService;
+
 
 @Controller
 @RequestMapping("/usuario")
@@ -30,14 +42,16 @@ public class UsuarioController {
 	private static final Logger logger = LoggerFactory.getLogger(UsuarioController.class);
 	
 	private PapelRepository papelRepository;
-	private CadastroUsuarioService cadastroUsuarioService;
+	private UsuarioService usuarioService;
 	private PasswordEncoder passwordEncoder;
+	private UsuarioRepository usuarioRepository;
 	
-	public UsuarioController(PapelRepository papelRepository, CadastroUsuarioService cadastroUsuarioService,
-			PasswordEncoder passwordEncoder) {
+	public UsuarioController(PapelRepository papelRepository, UsuarioService usuarioService,
+			PasswordEncoder passwordEncoder, UsuarioRepository usuarioRepository) {
 		this.papelRepository = papelRepository;
-		this.cadastroUsuarioService = cadastroUsuarioService;
+		this.usuarioService = usuarioService;
 		this.passwordEncoder = passwordEncoder;
+		this.usuarioRepository = usuarioRepository;
 	}
 
 	@GetMapping("/cadastrar")
@@ -63,7 +77,7 @@ public class UsuarioController {
 			usuario.setPapeis(papeis);
 			usuario.setAtivo(true);
 			usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
-			cadastroUsuarioService.salvar(usuario.toUsuario());
+			usuarioService.salvar(usuario.toUsuario());
 			redirectAttributes.addFlashAttribute("notificacaoSA2", new NotificacaoSweetAlert2("Cadastro de usuário efetuado com sucesso.",
                     TipoNotificaoSweetAlert2.SUCCESS, 4000));
 			return "redirect:/usuario/cadastrar";
@@ -93,11 +107,65 @@ public class UsuarioController {
 		} else {
 			usuario.setAtivo(true);
 			usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
-			cadastroUsuarioService.salvar(usuario.toUsuario());
+			usuarioService.salvar(usuario.toUsuario());
 			redirectAttributes.addFlashAttribute("notificacaoSA2", new NotificacaoSweetAlert2("Cadastro de usuário efetuado com sucesso.",
                     TipoNotificaoSweetAlert2.SUCCESS, 4000));
 			return "redirect:/usuario/cadastrar_admin";
 		}
 	}
+
+	@GetMapping("/alterar")
+	public String abrirAlterarUsuario(@AuthenticationPrincipal UserDetails userDetails, Model model){
+		String nome_usuario = userDetails.getUsername();
+
+		Usuario usuario = usuarioRepository.findByNomeIgnoreCase(nome_usuario);
+		logger.info("usuario para alterar: {}", usuario);
+
+		UsuarioDTOInput usuarioDTOInput = UsuarioDTOInput.fromUsuario(usuario);
+		logger.info("usuariodto para alterar: {}", usuarioDTOInput.getCodigo());
+
+		model.addAttribute("usuarioDTOInput", usuarioDTOInput);
+		model.addAttribute("metodosBancarios", BankMethod.values());
+		return "usuario/alterar :: formulario";
+	}
+
+	@PostMapping("/alterar")
+	public String alterarUsuario(@Valid UsuarioDTOInput usuario, BindingResult resultado, Model model, 
+		RedirectAttributes redirectAttributes, HttpServletResponse response) {
+		logger.info("usuariodto no post: {}", usuario.getCodigo());
+		if (resultado.hasErrors()) {
+			logger.info("Algum dado do usuario recebido para alterar não é válido.");
+			logger.info("Erros encontrados:");
+			for (FieldError erro : resultado.getFieldErrors()) {
+				logger.info("{}", erro);
+			}
+			model.addAttribute("metodosBancarios", BankMethod.values());
+			return "usuario/alterar :: formulario";
+		} else {
+			Papel usuario_papel = papelRepository.findByNome("ROLE_USUARIO");
+			List<Papel> papeis = new ArrayList<>();
+			papeis.add(usuario_papel);
+			usuario.setPapeis(papeis);
+			usuario.setAtivo(true);
+			usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
+			usuarioService.atualizar(usuario.toUsuario());
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			User principalAtual = (User) auth.getPrincipal();
+			User novoPrincipal = new User(
+				usuario.getNome(),             
+				principalAtual.getPassword(), 
+				principalAtual.getAuthorities()
+			);
+			SecurityContextHolder.getContext().setAuthentication(
+				new UsernamePasswordAuthenticationToken(novoPrincipal, principalAtual.getPassword(), principalAtual.getAuthorities())
+			);
+
+			redirectAttributes.addFlashAttribute("notificacaoSA2", new NotificacaoSweetAlert2("Dados do usuário alterados com sucesso.",
+			TipoNotificaoSweetAlert2.SUCCESS, 4000));
+			
+			return "redirect:/usuario/alterar";
+		}
+	}
+	
 
 }
