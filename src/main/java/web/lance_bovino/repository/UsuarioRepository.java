@@ -10,6 +10,8 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 	
 	Usuario findByNomeIgnoreCase(String nomeUsuario);
 
+	Usuario findByNome(String nomeUsuario);
+
 	Optional<Usuario> findByCodigoAndAtivo(long codigo, boolean ativo);
 
     Usuario findByCpf(String cpf);

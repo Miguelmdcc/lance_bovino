@@ -11,7 +11,7 @@
   <!-- conteudo principal -->
   <main layout:fragment="conteudo" th:fragment="formulario" id="main" class="flex flex-col align-middle w-full m-10">
 
-        <form th:hx-post="@{/usuario/cadastrar_admin}" th:object="${usuarioAdminDTOInput}" class="w-1/2 mt-10 ms-16">
+        <form th:hx-post="@{/usuario/cadastrar_admin}" th:object="${usuarioDTOInput}" class="w-1/2 mt-10 ms-16">
 
           <div th:replace="~{components/forms :: inputTexto(
             textoLabel='Nome', 
@@ -20,7 +20,7 @@
 
           <div th:replace="~{components/forms :: inputCpf(
             textoLabel='CPF', 
-            nomeAtributo='cpf_adm',
+            nomeAtributo='cpf',
             isValidado=true)}"></div>
 
           <div class="flex justify-between">

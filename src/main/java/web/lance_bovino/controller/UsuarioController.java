@@ -16,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +24,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import web.lance_bovino.dto.UsuarioAdminDTOInput;
 import web.lance_bovino.dto.UsuarioDTOInput;
 import web.lance_bovino.model.BankMethod;
 import web.lance_bovino.model.Papel;
@@ -61,7 +61,7 @@ public class UsuarioController {
 	}
 	
 	@PostMapping("/cadastrar")
-	public String cadastrarNovoUsuario(@Valid UsuarioDTOInput usuario, BindingResult resultado, Model model, RedirectAttributes redirectAttributes) {
+	public String cadastrarNovoUsuario(@Validated(UsuarioDTOInput.CreateLogin.class) UsuarioDTOInput usuario, BindingResult resultado, Model model, RedirectAttributes redirectAttributes) {
 		if (resultado.hasErrors()) {
 			logger.info("O usuario recebido para cadastrar não é válido.");
 			logger.info("Erros encontrados:");
@@ -85,7 +85,7 @@ public class UsuarioController {
 	}
 
 	@GetMapping("/cadastrar_admin")
-	public String abrirCadastroUsuarioAdmin(UsuarioAdminDTOInput usuario, Model model) {
+	public String abrirCadastroUsuarioAdmin(UsuarioDTOInput usuario, Model model) {
 		List<Papel> papeis = papelRepository.findAll();
 		model.addAttribute("todosPapeis", papeis);
 		model.addAttribute("metodosBancarios", BankMethod.values());
@@ -93,7 +93,7 @@ public class UsuarioController {
 	}
 	
 	@PostMapping("/cadastrar_admin")
-	public String cadastrarNovoUsuarioAdmin(@Valid UsuarioAdminDTOInput usuario, BindingResult resultado, Model model, RedirectAttributes redirectAttributes) {
+	public String cadastrarNovoUsuarioAdmin(@Validated(UsuarioDTOInput.AdminCreateUser.class) UsuarioDTOInput usuario, BindingResult resultado, Model model, RedirectAttributes redirectAttributes) {
 		if (resultado.hasErrors()) {
 			logger.info("O usuario recebido para cadastrar não é válido.");
 			logger.info("Erros encontrados:");
@@ -118,7 +118,7 @@ public class UsuarioController {
 	public String abrirAlterarUsuario(@AuthenticationPrincipal UserDetails userDetails, Model model){
 		String nome_usuario = userDetails.getUsername();
 
-		Usuario usuario = usuarioRepository.findByNomeIgnoreCase(nome_usuario);
+		Usuario usuario = usuarioRepository.findByNome(nome_usuario);
 		logger.info("usuario para alterar: {}", usuario);
 
 		UsuarioDTOInput usuarioDTOInput = UsuarioDTOInput.fromUsuario(usuario);
@@ -130,7 +130,7 @@ public class UsuarioController {
 	}
 
 	@PostMapping("/alterar")
-	public String alterarUsuario(@Valid UsuarioDTOInput usuario, BindingResult resultado, Model model, 
+	public String alterarUsuario(@Validated(UsuarioDTOInput.Edit.class) UsuarioDTOInput usuario, BindingResult resultado, Model model, 
 		RedirectAttributes redirectAttributes, HttpServletResponse response) {
 		logger.info("usuariodto no post: {}", usuario.getCodigo());
 		if (resultado.hasErrors()) {
@@ -147,7 +147,9 @@ public class UsuarioController {
 			papeis.add(usuario_papel);
 			usuario.setPapeis(papeis);
 			usuario.setAtivo(true);
-			usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
+			if (usuario.getSenha() != null && !usuario.getSenha().isBlank()) {
+				usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
+			}
 			usuarioService.atualizar(usuario.toUsuario());
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			User principalAtual = (User) auth.getPrincipal();

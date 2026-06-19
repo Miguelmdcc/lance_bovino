@@ -36,11 +36,24 @@ public class UsuarioService {
         usuarioRepository.save(usuario); 
     } 
 
-    @Transactional 
-    public void atualizar(Usuario usuario) { 
-        logger.info("Atualizando usuario: {}", usuario); 
-        usuarioRepository.save(usuario); 
-    } 
+    @Transactional
+    public void atualizar(Usuario usuarioDadosNovos) {
+        Usuario usuarioBanco = usuarioRepository.findById(usuarioDadosNovos.getCodigo())
+            .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
+            
+        usuarioBanco.setNome(usuarioDadosNovos.getNome());
+        usuarioBanco.setCpf(usuarioDadosNovos.getCpf());
+        usuarioBanco.setMetodoBancario(usuarioDadosNovos.getMetodoBancario());
+        usuarioBanco.setDadosBancarios(usuarioDadosNovos.getDadosBancarios());
+        usuarioBanco.setPapeis(usuarioDadosNovos.getPapeis());
+        usuarioBanco.setAtivo(usuarioDadosNovos.isAtivo());
+        
+        if (usuarioDadosNovos.getSenha() != null) {
+            usuarioBanco.setSenha(usuarioDadosNovos.getSenha());
+        }
+
+        usuarioRepository.save(usuarioBanco);
+    }
 
     @Transactional 
     public void remover(Long codigo) { 
