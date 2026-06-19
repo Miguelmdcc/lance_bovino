@@ -2,9 +2,11 @@ package web.lance_bovino.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import web.lance_bovino.filter.UsuarioFilter;
 import web.lance_bovino.model.Usuario;
 import web.lance_bovino.repository.UsuarioRepository;
 
@@ -19,11 +21,11 @@ public class UsuarioService {
         this.usuarioRepository = usuarioRepository;
     }
 
-    // @Transactional(readOnly = true)
-    // public Page<Usuario> pesquisar(UsuarioFilter filtro, Pageable pageable) {
-    //     logger.info("Pesquisando usuários com o filtro {}", filtro);
-    //     return usuarioRepository.pesquisar(filtro, pageable);
-    // }
+    @Transactional(readOnly = true)
+    public Page<Usuario> pesquisar(UsuarioFilter filtro, Pageable pageable) {
+        logger.info("Pesquisando usuários com o filtro {}", filtro);
+        return usuarioRepository.pesquisar(filtro, pageable);
+    }
 
     @Transactional(readOnly = true)
     public Usuario buscarPeloCPF(String cpf) {

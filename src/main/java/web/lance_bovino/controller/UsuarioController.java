@@ -2,9 +2,13 @@ package web.lance_bovino.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,15 +25,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import web.lance_bovino.dto.UsuarioDTOInput;
+import web.lance_bovino.filter.UsuarioFilter;
 import web.lance_bovino.model.BankMethod;
 import web.lance_bovino.model.Papel;
 import web.lance_bovino.model.Usuario;
 import web.lance_bovino.notification.NotificacaoSweetAlert2;
 import web.lance_bovino.notification.TipoNotificaoSweetAlert2;
+import web.lance_bovino.pagination.PageWrapper;
 import web.lance_bovino.repository.PapelRepository;
 import web.lance_bovino.repository.UsuarioRepository;
 import web.lance_bovino.service.UsuarioService;
@@ -53,6 +58,24 @@ public class UsuarioController {
 		this.passwordEncoder = passwordEncoder;
 		this.usuarioRepository = usuarioRepository;
 	}
+
+	@GetMapping("/abrirpesquisar")
+    public String abrirPesquisa(Model model) {
+		model.addAttribute("metodosBancarios", BankMethod.values());
+        return "usuario/pesquisar :: formulario";
+    }
+
+    @GetMapping("/pesquisar")
+    public String pesquisar(UsuarioFilter filtro, Model model,
+            @PageableDefault(size = 9) @SortDefault(sort = "codigo",
+                    direction = Sort.Direction.ASC) Pageable pageable,
+            HttpServletRequest request) {
+        Page<Usuario> pagina = usuarioService.pesquisar(filtro, pageable);
+        logger.info("Usuarios pesquisadas: {}", pagina.getContent());
+        PageWrapper<Usuario> paginaWrapper = new PageWrapper<>(pagina, request);
+        model.addAttribute("pagina", paginaWrapper);
+        return "usuario/mostrar :: tabela";
+    }
 
 	@GetMapping("/cadastrar")
 	public String abrirCadastroUsuario(UsuarioDTOInput usuario, Model model) {
