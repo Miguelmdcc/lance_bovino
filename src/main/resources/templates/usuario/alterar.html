@@ -10,6 +10,11 @@
 <body>
   <!-- conteudo principal -->
   <main layout:fragment="conteudo" th:fragment="formulario" id="main" class="flex flex-col align-middle w-full m-10">
+    <div id="botao-user" hx-swap-oob="true" sec:authorize="isAuthenticated()">
+        <a th:hx-get="@{/usuario/alterar}" hx-target="#main" hx-swap="outerHTML" hx-push-url="true"
+        class="ml-5 rounded-lg border-2 border-gray-600 px-8 py-2 text-gray-300 shadow-md hover:bg-white hover:text-gray-600">
+        <span sec:authentication="principal.username"></span></a>
+    </div>
 
     <h1 th:if="${usuarioDTOInput == null}" class="text-2xl md:text-4xl text-center">Não foi encontrado usuário com esse código
     </h1>

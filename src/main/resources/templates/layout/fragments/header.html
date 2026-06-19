@@ -34,7 +34,7 @@
           Cadastrar </a>
         </div>
         <!-- nome do usuario -->
-        <div sec:authorize="isAuthenticated()">
+        <div id="botao-user" sec:authorize="isAuthenticated()">
             <a th:hx-get="@{/usuario/alterar}" hx-target="#main" hx-swap="outerHTML" hx-push-url="true"
             class="ml-5 rounded-lg border-2 border-gray-600 px-8 py-2 text-gray-300 shadow-md hover:bg-white hover:text-gray-600">
             <span sec:authentication="principal.username"></span></a>
