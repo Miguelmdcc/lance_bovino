@@ -109,11 +109,6 @@ public class Usuario implements Serializable {
 		result = prime * result + ((codigo == null) ? 0 : codigo.hashCode());
 		result = prime * result + ((nome == null) ? 0 : nome.hashCode());
 		result = prime * result + ((cpf == null) ? 0 : cpf.hashCode());
-		result = prime * result + ((metodoBancario == null) ? 0 : metodoBancario.hashCode());
-		result = prime * result + ((dadosBancarios == null) ? 0 : dadosBancarios.hashCode());
-		result = prime * result + ((senha == null) ? 0 : senha.hashCode());
-		result = prime * result + (ativo ? 1231 : 1237);
-		result = prime * result + ((papeis == null) ? 0 : papeis.hashCode());
 		return result;
 	}
 	@Override
@@ -140,27 +135,9 @@ public class Usuario implements Serializable {
 				return false;
 		} else if (!cpf.equals(other.cpf))
 			return false;
-		if (metodoBancario != other.metodoBancario)
-			return false;
-		if (dadosBancarios == null) {
-			if (other.dadosBancarios != null)
-				return false;
-		} else if (!dadosBancarios.equals(other.dadosBancarios))
-			return false;
-		if (senha == null) {
-			if (other.senha != null)
-				return false;
-		} else if (!senha.equals(other.senha))
-			return false;
-		if (ativo != other.ativo)
-			return false;
-		if (papeis == null) {
-			if (other.papeis != null)
-				return false;
-		} else if (!papeis.equals(other.papeis))
-			return false;
 		return true;
 	}
+
 	@Override
 	public String toString() {
 		return "Usuario [codigo=" + codigo + ", nome=" + nome + ", cpf=" + cpf + ", metodoBancario=" + metodoBancario
