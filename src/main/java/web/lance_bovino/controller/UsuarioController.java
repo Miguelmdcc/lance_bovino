@@ -22,6 +22,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -69,8 +70,9 @@ public class UsuarioController {
     public String pesquisar(UsuarioFilter filtro, Model model,
             @PageableDefault(size = 9) @SortDefault(sort = "codigo",
                     direction = Sort.Direction.ASC) Pageable pageable,
-            HttpServletRequest request) {
-        Page<Usuario> pagina = usuarioService.pesquisar(filtro, pageable);
+            HttpServletRequest request,@AuthenticationPrincipal UserDetails userDetails) {
+		Long usuarioCodigo = usuarioRepository.findByNome(userDetails.getUsername()).getCodigo();
+        Page<Usuario> pagina = usuarioService.pesquisar(filtro, pageable, usuarioCodigo);
         logger.info("Usuarios pesquisadas: {}", pagina.getContent());
         PageWrapper<Usuario> paginaWrapper = new PageWrapper<>(pagina, request);
         model.addAttribute("pagina", paginaWrapper);
@@ -191,6 +193,27 @@ public class UsuarioController {
 			return "redirect:/usuario/alterar";
 		}
 	}
-	
 
+	@GetMapping("/alterar/{codigo}")
+    public String abrirAlterar(@PathVariable Long codigo, Model model) {
+        UsuarioDTOInput dto = UsuarioDTOInput.fromUsuario(usuarioService.buscar(codigo));
+        model.addAttribute("usuarioDTOInput", dto);
+		model.addAttribute("metodoBancario", BankMethod.values());
+        return "usuario/alterar :: formulario";
+    }
+
+	@GetMapping("/remover/{codigo}")
+    public String remover(@PathVariable Long codigo, RedirectAttributes atributos) {
+        Usuario usuario = usuarioService.buscar(codigo);
+        if (usuario != null) {
+			usuarioService.desativar(usuario);
+			atributos.addFlashAttribute("notificacaoSA2", new NotificacaoSweetAlert2("Usuário removido com sucesso.",
+				TipoNotificaoSweetAlert2.SUCCESS, 4000));
+        } else {
+			atributos.addFlashAttribute("notificacaoSA2", new NotificacaoSweetAlert2("Não foi encontrado um usuario com esse codigo",
+				TipoNotificaoSweetAlert2.SUCCESS, 4000));
+        }
+        return "redirect:/usuario/pesquisar";
+    }
+	
 }

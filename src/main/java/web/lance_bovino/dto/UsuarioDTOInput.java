@@ -114,7 +114,7 @@ public class UsuarioDTOInput {
         user.setDadosBancarios(dadosBancarios);
         user.setSenha(senha);
         user.setAtivo(ativo);
-        user.setPapeis(papeis);
+        user.setPapeis(new ArrayList<>(this.papeis));
         return user;
     }
 
@@ -127,7 +127,7 @@ public class UsuarioDTOInput {
         dto.setDadosBancarios(usuario.getDadosBancarios());
         dto.setSenha(usuario.getSenha());
         dto.setAtivo(usuario.isAtivo());
-        dto.setPapeis(usuario.getPapeis());
+        dto.setPapeis(new ArrayList<>(usuario.getPapeis()));
         return dto;
     }
 
