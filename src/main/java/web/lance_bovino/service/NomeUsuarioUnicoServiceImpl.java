@@ -16,24 +16,24 @@ public class NomeUsuarioUnicoServiceImpl implements NomeUsuarioUnicoService {
 
 	@Override
 	public boolean isValueUnique(Object value, String fieldName) throws UnsupportedOperationException {
-		if (!fieldName.equals("nomeUsuario")) {
-			throw new UnsupportedOperationException("A anotação deveria ser usada no atributo nomeUsuario");
+		if (!fieldName.equals("nome")) {
+			throw new UnsupportedOperationException("A anotação deveria ser usada no atributo nome");
 		}
 
 		UsuarioDTOInput novo = (UsuarioDTOInput) value;
-		//A validacao se foi preenchido um nomeUsuario nao eh obrigacao dessa verificacao
+		//A validacao se foi preenchido um nome nao eh obrigacao dessa verificacao
 		if (novo.getNome() == null || novo.getNome().isBlank()) {
 			return true;
 		}
 		
-		//Busca um  com esse nomeUsuario
+		//Busca um  com esse nome
 		Usuario comEsseNomeUsuario = usuarioRepository.findByNomeIgnoreCase(novo.getNome());
 		
-		//Nao existe um usuario com esse nomeUsuario, entao tudo bem
+		//Nao existe um usuario com esse nome, entao tudo bem
 		if (comEsseNomeUsuario == null) {
 			return true;
-		} else {  //Existe um contato com esse nomeUsuario
-			//Estao tentando validar um novo usuario com um nomeUsuario que ja existe 
+		} else {  //Existe um contato com esse nome
+			//Estao tentando validar um novo usuario com um nome que ja existe 
 			if (novo.getCodigo() == null) {
 				return false;
 			} else {  //O usuario sendo validado ja existe
@@ -42,7 +42,7 @@ public class NomeUsuarioUnicoServiceImpl implements NomeUsuarioUnicoService {
 				if (comEsseNomeUsuario.equals(antigo)) {
 					return true;
 				}
-				// Senao eh pq estao tentando validar um nomeUsuario que eh de outro usuario
+				// Senao eh pq estao tentando validar um nome que eh de outro usuario
 				return false;
 			}
 		}

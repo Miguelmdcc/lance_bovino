@@ -2,13 +2,14 @@ package web.lance_bovino.validation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import web.lance_bovino.validation.service.UniqueValue;
-import web.lance_bovino.validation.validator.UniqueValueAttributeValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
+import web.lance_bovino.validation.service.UniqueValue;
+import web.lance_bovino.validation.validator.UniqueValueAttributeValidator;
 
 //How to use:
 //
@@ -65,24 +66,25 @@ import jakarta.validation.Payload;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = UniqueValueAttributeValidator.class)
 @Documented
+@Repeatable(UniqueValueAttribute.List.class)
 public @interface UniqueValueAttribute {
 
     String attribute();
 
-	String message() default "";
+    String message() default "";
 
-	Class<?>[] groups() default {};
+    Class<?>[] groups() default {};
 
-	Class<? extends Payload>[] payload() default {};
-	
-	Class<? extends UniqueValue> service();
-	
+    Class<? extends Payload>[] payload() default {};
+    
+    Class<? extends UniqueValue> service();
+    
     String serviceQualifier() default "";
-	
-	@Target({ ElementType.TYPE, ElementType.ANNOTATION_TYPE })
-	@Retention(RetentionPolicy.RUNTIME)
-	@Documented
-	@interface List {
-		UniqueValueAttribute[] value();
-	}
+    
+    @Target({ ElementType.TYPE, ElementType.ANNOTATION_TYPE })
+    @Retention(RetentionPolicy.RUNTIME)
+    @Documented
+    @interface List {
+        UniqueValueAttribute[] value();
+    }
 }

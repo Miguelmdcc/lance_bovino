@@ -2,20 +2,26 @@ package web.lance_bovino.dto;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.hibernate.validator.constraints.br.CPF;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.groups.Default;
 import web.lance_bovino.model.BankMethod;
 import web.lance_bovino.model.Papel;
 import web.lance_bovino.model.Usuario;
+import web.lance_bovino.service.NomeUsuarioUnicoService;
 import web.lance_bovino.validation.UniqueValueAttribute;
 import web.lance_bovino.validation.cpfunico.CPFUnicoService;
 
 @UniqueValueAttribute(attribute = "cpf", message = "Esse CPF já foi usado por outra pessoa", service = CPFUnicoService.class)
+@UniqueValueAttribute(attribute = "nome", message = "Esse nome já foi usado por outra pessoa", service = NomeUsuarioUnicoService.class)
 public class UsuarioDTOInput {
+
+    public interface CreateLogin extends Default{}
+    public interface Edit extends Default{}
+    public interface AdminCreateUser extends Default{}
+    public interface AdminEditUser extends Default{}
 
     private Long codigo;
     @NotBlank(message = "O nome da pessoa é obrigatório")
@@ -28,11 +34,11 @@ public class UsuarioDTOInput {
     private BankMethod metodoBancario;
     @NotBlank(message = "Os dados bancários são obrigatórios")
     private String dadosBancarios;
-    @NotBlank(message = "A senha é obrigatória")
+    @NotBlank(message = "A senha é obrigatória", groups = {CreateLogin.class, AdminCreateUser.class})
     @Size(min = 5, max = 255, message = "A senha deve ter entre 5 e 255 caracteres")
     private String senha;
     private boolean ativo = true;
-    @Size(min = 1, message = "Ao menos um papel é obrigatório")
+    @Size(min = 1, message = "Ao menos um papel é obrigatório", groups = {AdminCreateUser.class, AdminEditUser.class})
     private List<Papel> papeis = new ArrayList<>();
 
     public Long getCodigo() {
@@ -108,7 +114,7 @@ public class UsuarioDTOInput {
         user.setDadosBancarios(dadosBancarios);
         user.setSenha(senha);
         user.setAtivo(ativo);
-        user.setPapeis(papeis);
+        user.setPapeis(new ArrayList<>(this.papeis));
         return user;
     }
 
@@ -121,7 +127,7 @@ public class UsuarioDTOInput {
         dto.setDadosBancarios(usuario.getDadosBancarios());
         dto.setSenha(usuario.getSenha());
         dto.setAtivo(usuario.isAtivo());
-        dto.setPapeis(usuario.getPapeis());
+        dto.setPapeis(new ArrayList<>(usuario.getPapeis()));
         return dto;
     }
 

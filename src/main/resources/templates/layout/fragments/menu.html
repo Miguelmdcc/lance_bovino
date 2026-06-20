@@ -25,6 +25,23 @@
       </div>
     </div>
 
+    <!-- 2o Item Menu -->
+    <div x-data="{ open: false }" sec:authorize="hasRole('ROLE_ADMIN')">
+      <button th:replace="~{components/menu-item-button :: menu-item-button('ADMIN', ~{::#pessoa-icon})}"></button>
+
+      <!-- Opcoes do 1o Item Menu -->
+      <div x-show="open" class="space-y-4 ps-10">
+        <!-- 1a Opcao -->
+        <div
+          th:replace="~{components/menu-item-option :: menu-item-option('Cadastrar', @{/usuario/cadastrar_admin}, ~{::#cadastrar-icon})}">
+        </div>
+        <!-- 2a Opcao -->
+        <div
+          th:replace="~{components/menu-item-option :: menu-item-option('Pesquisar', @{/usuario/abrirpesquisar}, ~{::#pesquisar-icon})}">
+        </div>
+      </div>
+    </div>
+
   </div>
 
 </div>

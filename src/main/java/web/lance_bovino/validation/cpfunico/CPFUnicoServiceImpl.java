@@ -1,7 +1,6 @@
 package web.lance_bovino.validation.cpfunico;
 
 import java.security.InvalidParameterException;
-
 import org.springframework.stereotype.Service;
 import web.lance_bovino.dto.UsuarioDTOInput;
 import web.lance_bovino.model.Usuario;
@@ -21,7 +20,6 @@ public class CPFUnicoServiceImpl implements CPFUnicoService {
 		if (!fieldName.equals("cpf")) {
 			throw new UnsupportedOperationException("A anotação deveria ser usada no atributo cpf");
 		}
-
 		Usuario novo = ((UsuarioDTOInput) value).toUsuario();
 		//A validacao "foi preenchido um cpf" nao eh obrigacao dessa verificacao
 		if (novo.getCpf() == null || novo.getCpf().isBlank()) {
@@ -40,9 +38,9 @@ public class CPFUnicoServiceImpl implements CPFUnicoService {
 				return false;
 			} else {  //O usuario sendo validado ja existe
 				Usuario antigo = usuarioService.buscar(novo.getCodigo());
-                if (antigo == null) {
-                    throw new InvalidParameterException("O código do contato a validar não existe.");
-                }
+				if (antigo == null) {
+					throw new InvalidParameterException("O código do contato a validar não existe.");
+				}
 				// Se o cpf sendo validado for o mesmo que ja existia no BD entao tudo bem
 				if (comEsseCPF.equals(antigo)) {
 					return true;

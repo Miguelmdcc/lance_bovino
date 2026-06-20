@@ -8,30 +8,30 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
-import web.lance_bovino.filter.UsuarioFilter;
-import web.lance_bovino.model.Usuario;
-import web.lance_bovino.pagination.PaginacaoUtil;
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+import web.lance_bovino.filter.UsuarioFilter;
+import web.lance_bovino.model.Usuario;
+import web.lance_bovino.pagination.PaginacaoUtil;
 
 public class UsuarioQueriesImpl implements UsuarioQueries {
 
 	@PersistenceContext
 	private EntityManager em;
 
-   	public Page<Usuario> pesquisar(UsuarioFilter filtro, Pageable pageable) {
-
-		StringBuilder queryUsuarios = new StringBuilder("select distinct u from User u");
+   	public Page<Usuario> pesquisar(UsuarioFilter filtro, Pageable pageable, Long usuarioCodigo) {
+		StringBuilder queryUsuarios = new StringBuilder("select distinct u from Usuario u");
 		StringBuilder condicoes = new StringBuilder();
 		Map<String, Object> parametros = new HashMap<>();
 
 		preencherCondicoesEParametros(filtro, condicoes, parametros);
 
 		if (condicoes.isEmpty()) {
-			condicoes.append(" where u.ativo = true");
+			condicoes.append(" where u.ativo = true and u.codigo != "+usuarioCodigo);
 		} else {
-			condicoes.append(" and u.ativo = true");
+			condicoes.append(" and u.ativo = true and u.codigo != "+usuarioCodigo);
 		}
 
 		queryUsuarios.append(condicoes);
@@ -41,7 +41,7 @@ public class UsuarioQueriesImpl implements UsuarioQueries {
 		PaginacaoUtil.preencherParametros(parametros, typedQuery);
 		List<Usuario> usuarios = typedQuery.getResultList();
 
-		long totalUsuarios = PaginacaoUtil.getTotalRegistros("User", "u", condicoes, parametros, em);
+		long totalUsuarios = PaginacaoUtil.getTotalRegistros("Usuario", "u", condicoes, parametros, em);
 
 		return new PageImpl<>(usuarios, pageable, totalUsuarios);
 	}
