@@ -157,7 +157,6 @@ public class UsuarioController {
 	@PostMapping("/alterar")
 	public String alterarUsuario(@Validated(UsuarioDTOInput.Edit.class) UsuarioDTOInput usuario, BindingResult resultado, Model model, 
 		RedirectAttributes redirectAttributes, HttpServletResponse response) {
-		logger.info("usuariodto no post: {}", usuario.getCodigo());
 		if (resultado.hasErrors()) {
 			logger.info("Algum dado do usuario recebido para alterar não é válido.");
 			logger.info("Erros encontrados:");
@@ -194,12 +193,39 @@ public class UsuarioController {
 		}
 	}
 
+	@PostMapping("/alterar_admin")
+	public String alterarAdminUsuario(@Validated(UsuarioDTOInput.AdminEditUser.class) UsuarioDTOInput usuario, BindingResult resultado, Model model, 
+		RedirectAttributes redirectAttributes, HttpServletResponse response) {
+		if (resultado.hasErrors()) {
+			logger.info("Algum dado do usuario recebido para alterar não é válido.");
+			logger.info("Erros encontrados:");
+			for (FieldError erro : resultado.getFieldErrors()) {
+				logger.info("{}", erro);
+			}
+			model.addAttribute("metodosBancarios", BankMethod.values());
+			return "usuario/alterar_admin :: formulario";
+		} else {
+			usuario.setAtivo(true);
+			if (usuario.getSenha() != null && !usuario.getSenha().isBlank()) {
+				usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
+			}
+			usuarioService.atualizar(usuario.toUsuario());
+			redirectAttributes.addAttribute("codigo", usuario.getCodigo());
+			redirectAttributes.addFlashAttribute("notificacaoSA2", new NotificacaoSweetAlert2("Dados do usuário alterados com sucesso.",
+			TipoNotificaoSweetAlert2.SUCCESS, 4000));
+			
+			return "redirect:/usuario/alterar/{codigo}";
+		}
+	}
+
 	@GetMapping("/alterar/{codigo}")
     public String abrirAlterar(@PathVariable Long codigo, Model model) {
         UsuarioDTOInput dto = UsuarioDTOInput.fromUsuario(usuarioService.buscar(codigo));
         model.addAttribute("usuarioDTOInput", dto);
-		model.addAttribute("metodoBancario", BankMethod.values());
-        return "usuario/alterar :: formulario";
+		List<Papel> papeis = papelRepository.findAll();
+		model.addAttribute("todosPapeis", papeis);
+		model.addAttribute("metodosBancarios", BankMethod.values());
+        return "usuario/alterar_admin :: formulario";
     }
 
 	@GetMapping("/remover/{codigo}")
