@@ -1,11 +1,15 @@
 package web.lance_bovino.filter;
 
+import org.springframework.format.annotation.NumberFormat;
+
 public class GadoFilter {
 
     private Long codigo;
     private String nome;
+    @NumberFormat(pattern = "#,##0.00")
     private Double peso;
     private String raca;
+    @NumberFormat(pattern = "#,##0.00")
     private Double altura;
     private Integer idade;
     

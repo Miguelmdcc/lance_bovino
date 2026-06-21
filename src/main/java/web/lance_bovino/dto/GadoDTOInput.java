@@ -1,11 +1,14 @@
 package web.lance_bovino.dto;
 
+import org.springframework.format.annotation.NumberFormat;
+
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import web.lance_bovino.model.Gado;
 import web.lance_bovino.model.Status;
+import web.lance_bovino.model.Usuario;
 
 public class GadoDTOInput {
 
@@ -15,15 +18,18 @@ public class GadoDTOInput {
     private String nome;
     @NotNull(message = "O peso do gado é obrigatório")
     @Min(value = 1, message = "O peso do gado deve ser maior que 0")
+    @NumberFormat(pattern = "#,##0.00")
     private Double peso;
     @NotBlank(message = "A raça do gado é obrigatória")
     private String raca;
     @NotNull(message = "A altura do gado é obrigatória")
     @Min(value = 1, message = "A altura do gado deve ser maior que 0")
+    @NumberFormat(pattern = "#,##0.00")
     private Double altura;
     @NotNull(message = "A idade do gado é obrigatória")
     @Min(value = 1, message = "A idade do gado deve ser maior que 0")
     private Integer idade;
+    private Long codigoUsuario;
     private Status status = Status.ATIVO;
 
     public Long getCodigo() {
@@ -74,6 +80,14 @@ public class GadoDTOInput {
         this.idade = idade;
     }
 
+    public Long getCodigoUsuario() {
+        return codigoUsuario;
+    }
+
+    public void setCodigoUsuario(Long codigoUsuario) {
+        this.codigoUsuario = codigoUsuario;
+    }
+
     public Status getStatus() {
         return status;
     }
@@ -90,6 +104,9 @@ public class GadoDTOInput {
         gado.setRaca(raca);
         gado.setAltura(altura);
         gado.setIdade(idade);
+        Usuario usuario = new Usuario();
+        usuario.setCodigo(codigoUsuario);
+        gado.setUsuario(usuario);
         gado.setStatus(status);
         return gado;
     }
@@ -102,13 +119,15 @@ public class GadoDTOInput {
         dto.setRaca(gado.getRaca());
         dto.setAltura(gado.getAltura());
         dto.setIdade(gado.getIdade());
+        dto.setCodigoUsuario(gado.getUsuario().getCodigo());
         dto.setStatus(gado.getStatus());
         return dto;
     }
 
     @Override
     public String toString() {
-        return "GadoDTOInput [codigo=" + codigo + ", nome=" + nome + ", peso=" + peso + ", raca=" + raca + ", altura=" + altura + ", idade=" + idade + ", status=" + status + "]";
+        return "GadoDTOInput [codigo=" + codigo + ", nome=" + nome + ", peso=" + peso + ", raca=" + raca + ", altura="
+                + altura + ", idade=" + idade + ", codigoUsuario=" + codigoUsuario + ", status=" + status + "]";
     }
 
 }

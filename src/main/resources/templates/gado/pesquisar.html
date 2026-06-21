@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.thymeleaf.org" layout:decorate="~{layout/layoutpadrao}" >
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.thymeleaf.org"
+  layout:decorate="~{layout/layoutpadrao}">
 
 <head>
   <meta charset="UTF-8" />
@@ -11,23 +12,44 @@
   <!-- conteudo principal -->
   <main layout:fragment="conteudo" th:fragment="formulario" id="main" class="flex flex-col align-middle w-full m-10">
 
-    <form th:hx-get="@{/gado/pesquisar}" class="w-1/2 mt-10 ms-16">
-        <div th:replace="~{components/forms :: inputSimples('Código', codigo, 'number')}"></div> 
-        <div th:replace="~{components/forms :: inputSimples('Nome', nome, 'text')}"></div> 
-        <div th:replace="~{components/forms :: inputSimples('Peso(KG)', peso, 'text')}"></div> 
-        <div th:replace="~{components/forms :: inputSimples('Raça', raca, 'text')}"></div> 
-        <div th:replace="~{components/forms :: inputSimples('Altura(M)', altura, 'text')}"></div> 
-        <div th:replace="~{components/forms :: inputSimples('Idade(Meses)', idade, 'text')}"></div> 
-        <button type="submit" class="mt-7 py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-100 text-blue-800 hover:bg-blue-200 focus:outline-none focus:bg-blue-200 disabled:opacity-50 disabled:pointer-events-none">Pesquisar</button>
+    <form th:hx-get="@{/gado/pesquisar}" class="w-1/2 mt-8 ms-16">
+          <div th:replace="~{components/forms :: inputTexto(
+            textoLabel='Nome', 
+            nomeAtributo='nome')}"></div>
+
+          <div th:replace="~{components/forms :: inputDecimal(
+            textoLabel='Peso(KG)', 
+            nomeAtributo='peso')}"></div>
+
+          <div class="flex justify-between">
+            <div class="w-1/2 me-5">
+                <div th:replace="~{components/forms :: inputTexto(
+                    textoLabel='Raça', 
+                    nomeAtributo='raca')}"></div>   
+            </div>
+            <div class="w-1/2">
+          <div th:replace="~{components/forms :: inputDecimal(
+            textoLabel='Altura(m)', 
+            nomeAtributo='altura')}"></div>
+            </div>
+          </div>        
+
+          <div class="flex justify-between">
+            <div class="w-1/2 me-5">
+                <div th:replace="~{components/forms :: inputNumero(
+                    textoLabel='Idade(Meses)', 
+                    nomeAtributo='idade')}"></div>   
+            </div>
+            <div class="w-1/2">
+            </div>
+          </div>
+      <button type="submit"
+        class="mt-7 py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-100 text-blue-800 hover:bg-blue-200 focus:outline-none focus:bg-blue-200 disabled:opacity-50 disabled:pointer-events-none">Pesquisar</button>
     </form>
 
   </main>
   <!-- !conteudo principal -->
 
-  <!-- Nao usamos
-	<th:block layout:fragment="scripts">
-		<script src="../static/js/index.js" th:src="@{/js/index.js}"></script>
-	</th:block> -->
 </body>
 
 </html>
