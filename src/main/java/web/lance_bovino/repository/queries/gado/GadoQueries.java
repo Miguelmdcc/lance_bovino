@@ -7,6 +7,6 @@ import web.lance_bovino.model.Gado;
 
 public interface GadoQueries {
 
-	Page<Gado> pesquisar(GadoFilter filtro, Pageable pageable);
+	Page<Gado> pesquisar(GadoFilter filtro, Pageable pageable, Long usuarioCodigo);
 	
 }

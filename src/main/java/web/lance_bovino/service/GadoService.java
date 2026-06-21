@@ -23,9 +23,9 @@ public class GadoService {
     }
 
     @Transactional(readOnly = true)
-    public Page<Gado> pesquisar(GadoFilter filtro, Pageable pageable) {
+    public Page<Gado> pesquisar(GadoFilter filtro, Pageable pageable, Long usuarioCodigo) {
         logger.info("Pesquisando gados com o filtro {}", filtro);
-        return gadoRepository.pesquisar(filtro, pageable);
+        return gadoRepository.pesquisar(filtro, pageable, usuarioCodigo);
     }
 
     @Transactional 

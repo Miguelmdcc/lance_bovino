@@ -6,7 +6,8 @@ CREATE TABLE public.gado
     raca text,
     altura numeric(10,2),
     idade integer,
-    owner integer REFERENCES usuario(codigo),
+    codigo_usuario bigint NOT NULL,
     status text DEFAULT 'ATIVO',
-    PRIMARY KEY (codigo) 
+    PRIMARY KEY (codigo),
+    CONSTRAINT fk_gado_usuario FOREIGN KEY (codigo_usuario) REFERENCES public.usuario(codigo)
 );

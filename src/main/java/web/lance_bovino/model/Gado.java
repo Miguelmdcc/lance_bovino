@@ -7,9 +7,12 @@ import org.hibernate.annotations.DynamicUpdate;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
@@ -35,14 +38,13 @@ public class Gado implements Serializable {
     
     private Integer idade;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "codigo_usuario", referencedColumnName = "codigo")
+    private Usuario usuario;
+
     @Enumerated(EnumType.STRING)
     private Status status = Status.ATIVO;
 
-    // Construtor padrão necessário para o JPA
-    public Gado() {
-    }
-
-    // Getters e Setters
     public Long getCodigo() {
         return codigo;
     }
@@ -91,6 +93,14 @@ public class Gado implements Serializable {
         this.idade = idade;
     }
 
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
     public Status getStatus() {
         return status;
     }
@@ -99,10 +109,10 @@ public class Gado implements Serializable {
         this.status = status;
     }
 
-    // Método toString para ajudar nos logs do sistema
     @Override
     public String toString() {
-        return "Gado [codigo=" + codigo + ", nome=" + nome + ", peso=" + peso + ", raca=" + raca + 
-               ", altura=" + altura + ", idade=" + idade + ", status=" + status + "]";
+        return "Gado [codigo=" + codigo + ", nome=" + nome + ", peso=" + peso + ", raca=" + raca + ", altura=" + altura
+                + ", idade=" + idade + ", usuario=" + usuario + ", status=" + status + "]";
     }
+
 }

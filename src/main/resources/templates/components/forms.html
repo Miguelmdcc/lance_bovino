@@ -336,6 +336,42 @@
   </th:block>
 </th:block>
 
+<th:block th:fragment="inputDecimal"
+  th:with="
+    disabledFlag=${isDisabled != null and isDisabled},
+    validFlag=${isValidado != null and isValidado},
+    precisao=${casasDecimais ?: 2}" 
+  xmlns:th="http://www.thymeleaf.org">
+
+  <label th:for="${nomeAtributo}" th:text="${textoLabel}" class="block text-gray-700 font-medium mb-2 mt-6">Label</label>
+
+  <th:block th:if="${validFlag}">
+    <div class="relative" th:with="temErro=${#fields.hasErrors('__${nomeAtributo}__')}">
+      <input type="text" th:field="*{__${nomeAtributo}__}" th:disabled="${disabledFlag}" autocomplete="off"
+             th:attr="data-casas=${precisao}"
+             th:class="|componentedecimal block w-full px-4 py-3 text-gray-500 disabled:opacity-50 rounded-lg border ${temErro ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-gray-500 focus:ring-gray-500'}|" />
+      
+      <input th:if="${disabledFlag}" type="hidden" th:name="${nomeAtributo}" th:value="*{__${nomeAtributo}__}" />
+
+      <div th:if="${temErro}" class="end-0 absolute items-center inset-y-0 flex pointer-events-none justify-center pe-3">
+        <svg class="shrink-0 size-4 text-red-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line>
+        </svg>
+      </div>
+    </div>
+    <p th:if="${#fields.hasErrors('__${nomeAtributo}__')}" th:each="erro : ${#fields.errors('__${nomeAtributo}__')}" th:text="${erro} + '. '" class="text-sm text-red-600 mt-2"></p>
+  </th:block>
+
+  <th:block th:unless="${validFlag}">
+    <div class="relative">
+      <input type="text" th:name="${nomeAtributo}" th:id="${nomeAtributo}" th:value="${valorAtributo}" th:disabled="${disabledFlag}" autocomplete="off"
+             th:attr="data-casas=${precisao}"
+             class="componentedecimal block w-full px-4 py-3 text-gray-500 disabled:opacity-50 border border-gray-300 rounded-lg focus:border-gray-500 focus:ring-gray-500" />
+      <input th:if="${disabledFlag}" type="hidden" th:name="${nomeAtributo}" th:value="${valorAtributo}" />
+    </div>
+  </th:block>
+</th:block>
+
 <th:block th:fragment="inputTextArea"
   th:with="
     disabledFlag=${isDisabled != null and isDisabled},

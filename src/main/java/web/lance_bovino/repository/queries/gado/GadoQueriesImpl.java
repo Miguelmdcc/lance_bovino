@@ -20,7 +20,7 @@ public class GadoQueriesImpl implements GadoQueries {
 	@PersistenceContext
 	private EntityManager em;
 
-   	public Page<Gado> pesquisar(GadoFilter filtro, Pageable pageable) {
+   	public Page<Gado> pesquisar(GadoFilter filtro, Pageable pageable, Long usuarioCodigo) {
 
 		StringBuilder queryGados = new StringBuilder("select distinct g from Gado g");
 		StringBuilder condicoes = new StringBuilder();
@@ -29,9 +29,9 @@ public class GadoQueriesImpl implements GadoQueries {
 		preencherCondicoesEParametros(filtro, condicoes, parametros);
 
 		if (condicoes.isEmpty()) {
-			condicoes.append(" where g.status = 'ATIVO'");
+			condicoes.append(" where g.status = 'ATIVO' and g.usuario.codigo = "+usuarioCodigo);
 		} else {
-			condicoes.append(" and g.status = 'ATIVO'");
+			condicoes.append(" and g.status = 'ATIVO' and g.usuario.codigo = "+usuarioCodigo);
 		}
 
 		queryGados.append(condicoes);
