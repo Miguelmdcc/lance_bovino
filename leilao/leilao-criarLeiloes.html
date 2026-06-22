@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR" layout:decorate="~{layout/layoutpadrao}" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
+  <title>Gerenciar Leilão</title>
+</head>
+
+<body>
+  <main layout:fragment="conteudo" th:fragment="formulario" id="main" class="flex flex-col align-middle w-full m-10">
+
+        <h1 class="text-2xl md:text-4xl text-gray-800 font-bold mb-6 ms-16" 
+            th:text="${leilaoDTOInput.id == null ? 'Criar Novo Leilão' : 'Alterar Leilão'}">
+        </h1>
+
+        <form th:hx-post="${leilaoDTOInput.id == null ? '/leilao/cadastrar' : '/leilao/alterar'}" 
+              th:object="${leilaoDTOInput}" 
+              class="w-1/2 mt-4 ms-16">
+          
+          <input type="hidden" th:field="*{id}" />
+
+          <div th:replace="~{components/forms :: inputTexto(
+            textoLabel='Nome do Leilão', 
+            nomeAtributo='nome',
+            isValidado=true)}"></div>
+
+          <div th:replace="~{components/forms :: inputDecimal(
+            textoLabel='Preço Inicial (R$)', 
+            nomeAtributo='initialPrice',
+            isValidado=true)}"></div>
+
+          <div class="mb-5 relative">
+            <label for="finalTimestamp" class="block text-sm font-medium mb-2 text-gray-700">Data e Hora de Encerramento</label>
+            <input type="datetime-local" id="finalTimestamp" th:field="*{finalTimestamp}"
+                   class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500" />
+            
+            <p class="text-sm text-red-600 mt-2" th:if="${#fields.hasErrors('finalTimestamp')}" th:errors="*{finalTimestamp}"></p>
+            
+            <p class="text-xs text-gray-500 mt-1" th:if="${leilaoDTOInput.id != null}">
+              * Regra: Você só pode <b>postergar</b> a data de um leilão já existente.
+            </p>
+          </div>
+
+          <div class="flex gap-4 mt-8">
+              <button type="submit" class="py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-100 text-blue-800 hover:bg-blue-200 focus:outline-none focus:bg-blue-200 disabled:opacity-50 disabled:pointer-events-none"
+                      th:text="${leilaoDTOInput.id == null ? 'Cadastrar Leilão' : 'Salvar Alterações'}">
+              </button>
+
+              <button th:if="${leilaoDTOInput.id != null}"
+                      type="button"
+                      th:hx-delete="@{/leilao/remover/{id}(id=*{id})}"
+                      hx-confirm="Tem certeza que deseja deletar este leilão? Todos os lances serão cancelados e nenhuma transação será feita."
+                      hx-target="#main"
+                      class="py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-red-100 text-red-800 hover:bg-red-200 focus:outline-none focus:bg-red-200 disabled:opacity-50 disabled:pointer-events-none">
+                Deletar Leilão
+              </button>
+          </div>
+        </form>
+  </main>
+  </body>
+</html>
