@@ -19,6 +19,9 @@ import jakarta.validation.Valid;
 import web.lance_bovino.dto.LeilaoDTOInput;
 import web.lance_bovino.model.Gado;
 import web.lance_bovino.model.StatusLeilao;
+import web.lance_bovino.model.Usuario;
+import web.lance_bovino.notification.NotificacaoSweetAlert2;
+import web.lance_bovino.notification.TipoNotificaoSweetAlert2;
 import web.lance_bovino.repository.UsuarioRepository;
 import web.lance_bovino.service.GadoService;
 
@@ -73,29 +76,32 @@ public class LeilaoController {
         BindingResult resultado, Model model, 
         RedirectAttributes redirectAttributes,@AuthenticationPrincipal UserDetails userDetails) {
 		if (resultado.hasErrors()) {
-			logger.info("O leilao recebido para cadastrar não é válido.");
-			logger.info("Erros encontrados:");
-			if (resultado.hasFieldErrors("finalDateTime")) {
+			logger.info("O leilao recebido para cadastrar não é válido.");			
+			if (resultado.hasFieldErrors("finalDateTime") 
+					&& !resultado.hasFieldErrors("dataFinal") 
+					&& !resultado.hasFieldErrors("horaFinal")) {
+				
 				resultado.rejectValue("dataFinal", "error.dataFinal", 
 					resultado.getFieldError("finalDateTime").getDefaultMessage());
 			}
+
+			logger.info("Erros encontrados:");
 			for (FieldError erro : resultado.getFieldErrors()) {
 				logger.info("{}", erro);
 			}
 			return "leilao/cadastrar :: formulario";
 		} else {
 			leilao.setStatus(StatusLeilao.AGUARDANDO);
-            // Usuario usuario = usuarioRepository.findByNome(userDetails.getUsername());
-            // if(usuario == null){
-            //     logger.info("Usuario com nome {} não encontrado", userDetails.getUsername());
-            //     redirectAttributes.addFlashAttribute("notificacaoSA2", new NotificacaoSweetAlert2("Usuário com o nome"+userDetails.getUsername(),
-            //         TipoNotificaoSweetAlert2.ERROR, 4000));
-            //     return "gado/cadastrar :: formulario";
-            // }
-            // gado.setCodigoUsuario(usuario.getCodigo());;
-			// gadoService.salvar(gado.toGado());
-			// redirectAttributes.addFlashAttribute("notificacaoSA2", new NotificacaoSweetAlert2("Cadastro de gado efetuado com sucesso.",
-            //         TipoNotificaoSweetAlert2.SUCCESS, 4000));
+            Usuario usuario = usuarioRepository.findByNome(userDetails.getUsername());
+            if(usuario == null){
+                logger.info("Usuario com nome {} não encontrado", userDetails.getUsername());
+                redirectAttributes.addFlashAttribute("notificacaoSA2", new NotificacaoSweetAlert2("Usuário com o nome"+userDetails.getUsername(),
+                    TipoNotificaoSweetAlert2.ERROR, 4000));
+                return "gado/cadastrar :: formulario";
+            }
+			leilao.salvar(leilao.toLeilao());
+			redirectAttributes.addFlashAttribute("notificacaoSA2", new NotificacaoSweetAlert2("Cadastro de gado efetuado com sucesso.",
+                    TipoNotificaoSweetAlert2.SUCCESS, 4000));
 			return "redirect:/leilao/cadastrar";
 		}
 	}
