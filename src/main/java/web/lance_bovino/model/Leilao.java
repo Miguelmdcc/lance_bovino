@@ -10,9 +10,12 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
@@ -26,7 +29,7 @@ public class Leilao implements Serializable {
     @Id
     @SequenceGenerator(name="gerador_leilao", sequenceName="leilao_codigo_seq", allocationSize=1)
     @GeneratedValue(generator="gerador_leilao", strategy=GenerationType.SEQUENCE)
-    private Long id;
+    private Long codigo;
 
     private String nome;
 
@@ -36,20 +39,23 @@ public class Leilao implements Serializable {
     @Column(name = "final_timestamp")
     private LocalDateTime finalTimestamp;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "codigo_usuario", referencedColumnName = "codigo")
+    private Usuario usuario;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "codigo_gado", referencedColumnName = "codigo")
+    private Gado gado;
+
     @Enumerated(EnumType.STRING)
     private StatusLeilao status = StatusLeilao.AGUARDANDO;
 
-    // Construtor padrão do JPA
-    public Leilao() {
+    public Long getCodigo() {
+        return codigo;
     }
 
-    // Getters e Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+    public void setCodigo(Long codigo) {
+        this.codigo = codigo;
     }
 
     public String getNome() {
@@ -76,6 +82,22 @@ public class Leilao implements Serializable {
         this.finalTimestamp = finalTimestamp;
     }
 
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    public Gado getGado() {
+        return gado;
+    }
+
+    public void setGado(Gado gado) {
+        this.gado = gado;
+    }
+
     public StatusLeilao getStatus() {
         return status;
     }
@@ -86,7 +108,8 @@ public class Leilao implements Serializable {
 
     @Override
     public String toString() {
-        return "Leilao [id=" + id + ", nome=" + nome + ", initialPrice=" + initialPrice + 
-               ", finalTimestamp=" + finalTimestamp + ", status=" + status + "]";
+        return "Leilao [codigo=" + codigo + ", nome=" + nome + ", initialPrice=" + initialPrice + ", finalTimestamp="
+                + finalTimestamp + ", usuario=" + usuario + ", gado=" + gado + ", status=" + status + "]";
     }
+
 }

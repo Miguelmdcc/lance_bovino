@@ -46,6 +46,50 @@ public class GadoQueriesImpl implements GadoQueries {
 		return new PageImpl<>(vacinas, pageable, totalGados);
 	}
 
+	public List<Gado> pesquisarGeral(String filtro) {
+		StringBuilder queryGados = new StringBuilder("select distinct g from Gado g");
+		StringBuilder condicoes = new StringBuilder();
+		Map<String, Object> parametros = new HashMap<>();
+		preencherCondicoesEParametrosString(filtro, condicoes, parametros);
+		if (condicoes.isEmpty()) {
+			condicoes.append(" where g.status = 'ATIVO'");
+		} else {
+			condicoes.append(" and g.status = 'ATIVO'");
+		}
+		queryGados.append(condicoes);
+		TypedQuery<Gado> typedQuery = em.createQuery(queryGados.toString(), Gado.class);
+		PaginacaoUtil.preencherParametros(parametros, typedQuery);
+		List<Gado> gados = typedQuery.getResultList();
+		return gados;
+	}
+
+	private void preencherCondicoesEParametrosString(String filtro, StringBuilder condicoes,
+			Map<String, Object> parametros) {
+		if(filtro != null){
+			boolean condicao = false;
+			try {
+				Long codigo = Long.parseLong(filtro);
+				if (!condicao) {
+					condicoes.append(" where ");
+				} else {
+					condicoes.append(" or ");
+				}
+				condicoes.append("g.codigo = :codigo");
+				parametros.put("codigo", codigo);
+				condicao = true;
+			} catch (NumberFormatException e) {
+				if (!condicao) {
+					condicoes.append(" where ");
+				} else {
+					condicoes.append(" or ");
+				}
+				condicoes.append("lower(g.nome) like :nome");
+				parametros.put("nome", "%" + filtro.toLowerCase() + "%");
+				condicao = true;
+			}
+		}
+	}
+
 	private void preencherCondicoesEParametros(GadoFilter filtro, StringBuilder condicoes, Map<String, Object> parametros) {
 		boolean condicao = false;
 
