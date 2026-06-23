@@ -15,7 +15,7 @@ public class LeilaoFilter {
     private LocalDateTime finalTimestamp;
     private Usuario usuario;
     private Gado gado;
-    private StatusLeilao status = StatusLeilao.AGUARDANDO;
+    private StatusLeilao status;
     
     public Long getCodigo() {
         return codigo;
