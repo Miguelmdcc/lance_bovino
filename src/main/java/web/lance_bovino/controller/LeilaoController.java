@@ -4,6 +4,11 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -15,13 +20,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import web.lance_bovino.dto.LeilaoDTOInput;
+import web.lance_bovino.filter.LeilaoFilter;
 import web.lance_bovino.model.Gado;
+import web.lance_bovino.model.Leilao;
 import web.lance_bovino.model.StatusLeilao;
 import web.lance_bovino.model.Usuario;
 import web.lance_bovino.notification.NotificacaoSweetAlert2;
 import web.lance_bovino.notification.TipoNotificaoSweetAlert2;
+import web.lance_bovino.pagination.PageWrapper;
 import web.lance_bovino.repository.UsuarioRepository;
 import web.lance_bovino.service.GadoService;
 import web.lance_bovino.service.LeilaoService;
@@ -45,32 +54,48 @@ public class LeilaoController {
 		this.leilaoService = leilaoService;
 	}
 
-	// @GetMapping("/abrirpesquisar")
-    // public String abrirPesquisa(Model model) {
-    //     return "gado/pesquisar :: formulario";
-    // }
+	@GetMapping("/abrirpesquisarmeusleiloes")
+    public String abrirPesquisa(String gadoBusca, Model model, @AuthenticationPrincipal UserDetails userDetails) {
+		Long codigo_usuario = usuarioRepository.findByNome(userDetails.getUsername()).getCodigo();
+        List<Gado> gados = gadoService.pesquisarGeral(gadoBusca, codigo_usuario);
+        logger.debug("Gados buscados: {}", gados);
+        model.addAttribute("gados", gados);
+		model.addAttribute("leilaoDTOInput", new LeilaoDTOInput());
+        return "leilao/pesquisar_meus_leiloes :: formulario";
+    }
 
-    // @GetMapping("/pesquisar")
-    // public String pesquisar(GadoFilter filtro, Model model,
-    //         @PageableDefault(size = 9) @SortDefault(sort = "codigo",
-    //                 direction = Sort.Direction.ASC) Pageable pageable,
-    //         HttpServletRequest request,@AuthenticationPrincipal UserDetails userDetails) {
-	// 	Long usuarioCodigo = usuarioRepository.findByNome(userDetails.getUsername()).getCodigo();
-    //     Page<Gado> pagina = gadoService.pesquisar(filtro, pageable, usuarioCodigo);
-    //     logger.info("Gados do usuario {} pesquisados: {}", userDetails.getUsername(), pagina.getContent());
-    //     PageWrapper<Gado> paginaWrapper = new PageWrapper<>(pagina, request);
-    //     model.addAttribute("pagina", paginaWrapper);
-    //     return "gado/mostrar :: tabela";
-    // }
+    @GetMapping("/pesquisarmeusleiloes")
+    public String pesquisar(LeilaoFilter filtro, Model model,
+            @PageableDefault(size = 9) @SortDefault(sort = "codigo",
+                    direction = Sort.Direction.ASC) Pageable pageable,
+            HttpServletRequest request,@AuthenticationPrincipal UserDetails userDetails) {
+		Long usuarioCodigo = usuarioRepository.findByNome(userDetails.getUsername()).getCodigo();
+        Page<Leilao> pagina = leilaoService.pesquisarUsuario(filtro, pageable, usuarioCodigo);
+        logger.info("Leiloes do usuario {} pesquisados: {}", userDetails.getUsername(), pagina.getContent());
+        PageWrapper<Leilao> paginaWrapper = new PageWrapper<>(pagina, request);
+        model.addAttribute("pagina", paginaWrapper);
+		model.addAttribute("status",StatusLeilao.values());
+        return "leilao/mostrar_meus_leiloes :: tabela";
+    }
 
 	@GetMapping("/cadastrar")
 	public String abrirCadastroLeilao(LeilaoDTOInput leilao, Model model) {
 		return "leilao/cadastrar :: formulario";
 	}
 
-    @GetMapping("/pesquisargado")
-    public String pesquisarGado(String gadoBusca, Model model) {
-        List<Gado> gados = gadoService.pesquisarGeral(gadoBusca);
+    @GetMapping("/pesquisargadocadastrar")
+    public String pesquisarGado(String gadoBusca, Model model,@AuthenticationPrincipal UserDetails userDetails) {
+		Long codigo_usuario = usuarioRepository.findByNome(userDetails.getUsername()).getCodigo();
+        List<Gado> gados = gadoService.pesquisarGeralNotInLeilao(gadoBusca, codigo_usuario);
+        logger.debug("Gados buscados: {}", gados);
+        model.addAttribute("gados", gados);
+        return "gado/listar :: lista";
+    }
+
+	@GetMapping("/pesquisargado")
+    public String pesquisarGadoCadastrar(String gadoBusca, Model model,@AuthenticationPrincipal UserDetails userDetails) {
+		Long codigo_usuario = usuarioRepository.findByNome(userDetails.getUsername()).getCodigo();
+        List<Gado> gados = gadoService.pesquisarGeral(gadoBusca, codigo_usuario);
         logger.debug("Gados buscados: {}", gados);
         model.addAttribute("gados", gados);
         return "gado/listar :: lista";
@@ -102,11 +127,11 @@ public class LeilaoController {
                 logger.info("Usuario com nome {} não encontrado", userDetails.getUsername());
                 redirectAttributes.addFlashAttribute("notificacaoSA2", new NotificacaoSweetAlert2("Usuário com o nome"+userDetails.getUsername(),
                     TipoNotificaoSweetAlert2.ERROR, 4000));
-                return "gado/cadastrar :: formulario";
+                return "leilao/cadastrar :: formulario";
             }
 			leilao.setUsuario(usuario);
 			leilaoService.salvar(leilao.toLeilao());
-			redirectAttributes.addFlashAttribute("notificacaoSA2", new NotificacaoSweetAlert2("Cadastro de gado efetuado com sucesso.",
+			redirectAttributes.addFlashAttribute("notificacaoSA2", new NotificacaoSweetAlert2("Cadastro de leilão efetuado com sucesso.",
                     TipoNotificaoSweetAlert2.SUCCESS, 4000));
 			return "redirect:/leilao/cadastrar";
 		}

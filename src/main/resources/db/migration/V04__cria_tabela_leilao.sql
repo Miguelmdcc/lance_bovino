@@ -6,7 +6,7 @@ CREATE TABLE public.leilao
     final_timestamp timestamp,
     codigo_usuario bigint NOT NULL,
     codigo_gado bigint NOT NULL,
-    status text DEFAULT 'Aguardando Início',
+    status text DEFAULT 'AGUARDANDO',
     PRIMARY KEY (codigo),
     CONSTRAINT fk_leilao_usuario FOREIGN KEY (codigo_usuario) REFERENCES public.usuario(codigo),
     CONSTRAINT fk_leilao_gado FOREIGN KEY (codigo_gado) REFERENCES public.gado(codigo)

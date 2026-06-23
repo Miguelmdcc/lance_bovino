@@ -41,6 +41,10 @@
         </div>
         <!-- 3a Opcao -->
         <div
+          th:replace="~{components/menu-item-option :: menu-item-option('Meus lances', @{/leilao/abrirpesquisarmeuslances}, ~{::#pesquisar-icon})}">
+        </div>
+        <!-- 4a Opcao -->
+        <div
           th:replace="~{components/menu-item-option :: menu-item-option('Leilões abertos', @{/leilao/abrirpesquisar}, ~{::#pesquisar-icon})}">
         </div>
       </div>

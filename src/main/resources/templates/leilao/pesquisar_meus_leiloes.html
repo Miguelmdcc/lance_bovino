@@ -1,27 +1,25 @@
 <!DOCTYPE html>
-<html lang="pt-BR" layout:decorate="~{layout/layoutpadrao}" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.thymeleaf.org">
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.thymeleaf.org"
+  layout:decorate="~{layout/layoutpadrao}">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
-  <title>Criando Leilão</title>
+  <title>Página Principal</title>
 </head>
 
 <body>
   <!-- conteudo principal -->
   <main layout:fragment="conteudo" th:fragment="formulario" id="main" class="flex flex-col align-middle w-full m-10">
 
-        <form th:hx-post="@{/leilao/cadastrar}" th:object="${leilaoDTOInput}" class="w-1/2 mt-10 ms-16">
-
+    <form th:hx-get="@{/leilao/pesquisarmeusleiloes}" class="w-1/2 mt-8 ms-16">
           <div th:replace="~{components/forms :: inputTexto(
             textoLabel='Nome', 
-            nomeAtributo='nome',
-            isValidado=true)}"></div>
+            nomeAtributo='nome')}"></div>
 
           <div th:replace="~{components/forms :: inputDecimal(
             textoLabel='Lance Inicial(R$)', 
-            nomeAtributo='initialPrice',
-            isValidado=true)}"></div>
+            nomeAtributo='initialPrice')}"></div>
 
             <div class="flex-1">
               <div th:replace="~{components/forms :: inputBuscavel(
@@ -30,8 +28,7 @@
                     valorAtributo=${leilaoDTOInput.gado != null ? leilaoDTOInput.gado.codigo : -1},
                     textoAtributo=${leilaoDTOInput.gado != null ? leilaoDTOInput.gado.nome : 'Selecione uma opção'},
                     placeholderBusca='Buscar gado...',
-                    urlBusca='/leilao/pesquisargadocadastrar',
-                    isValidado=true)}"></div>
+                    urlBusca='/leilao/pesquisargado')}"></div>
             </div>
           </div>      
 
@@ -39,21 +36,21 @@
             <div class="w-1/2">
               <div th:replace="~{components/forms :: inputData(
                   textoLabel='Data de Encerramento', 
-                  nomeAtributo='dataFinal',
-                  isValidado=true)}">
+                  nomeAtributo='dataFinal')}">
               </div>
             </div>
             
             <div class="w-1/2">
               <div th:replace="~{components/forms :: inputHora(
                   textoLabel='Hora de Encerramento', 
-                  nomeAtributo='horaFinal',
-                  isValidado=true)}">
+                  nomeAtributo='horaFinal')}">
               </div>
             </div>
           </div>
-          <button type="submit" class="py-3 px-4 inline-flex items-center mt-5 gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-100 text-blue-800 hover:bg-blue-200 focus:outline-none focus:bg-blue-200 disabled:opacity-50 disabled:pointer-events-none">Cadastrar</button>
-        </form>
+      <button type="submit"
+        class="mt-7 py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-100 text-blue-800 hover:bg-blue-200 focus:outline-none focus:bg-blue-200 disabled:opacity-50 disabled:pointer-events-none">Pesquisar</button>
+    </form>
+
   </main>
   <!-- !conteudo principal -->
 

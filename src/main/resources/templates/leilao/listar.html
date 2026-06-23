@@ -1,0 +1,11 @@
+<th:block th:fragment="lista" xmlns:th="http://www.thymeleaf.org">
+    <li th:if="${#lists.isEmpty(leiloes)}" class="p-2 text-gray-500 italic cursor-default pointer-events-none">
+        Nenhum leilao encontrado.
+    </li>
+
+    <li th:each="leilao : ${leiloes}" class="p-2 hover:bg-gray-100 cursor-pointer" 
+        th:data-value="${leilao.codigo}" 
+        th:data-text="${leilao.nome}" 
+        th:text="${leilao.nome}">
+    </li>
+</th:block>

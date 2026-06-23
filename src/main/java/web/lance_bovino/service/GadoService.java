@@ -56,7 +56,12 @@ public class GadoService {
     }
 
     @Transactional(readOnly = true)
-    public List<Gado> pesquisarGeral(String busca) {
-        return gadoRepository.pesquisarGeral(busca);
+    public List<Gado> pesquisarGeral(String busca, Long codigo_usuario) {
+        return gadoRepository.pesquisarGeral(busca, codigo_usuario);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Gado> pesquisarGeralNotInLeilao(String busca, Long codigo_usuario) {
+        return gadoRepository.pesquisarGeralNotInLeilao(busca, codigo_usuario);
     }
 } 

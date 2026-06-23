@@ -1,5 +1,6 @@
 package web.lance_bovino.repository.queries.leilao;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import web.lance_bovino.filter.LeilaoFilter;
 import web.lance_bovino.model.Leilao;
+import web.lance_bovino.model.StatusLeilao;
 import web.lance_bovino.pagination.PaginacaoUtil;
 
 public class LeilaoQueriesImpl implements LeilaoQueries {
@@ -30,9 +32,9 @@ public class LeilaoQueriesImpl implements LeilaoQueries {
 		preencherCondicoesEParametros(filtro, condicoes, parametros);
 
 		if (condicoes.isEmpty()) {
-			condicoes.append(" where l.status = 'Aberto para Lances' and l.usuario.codigo = "+usuarioCodigo);
+			condicoes.append(" where l.usuario.codigo = "+usuarioCodigo);
 		} else {
-			condicoes.append(" and l.status = 'Aberto para Lances' and l.usuario.codigo = "+usuarioCodigo);
+			condicoes.append(" and l.usuario.codigo = "+usuarioCodigo);
 		}
 
 		queryLeilao.append(condicoes);
@@ -53,9 +55,9 @@ public class LeilaoQueriesImpl implements LeilaoQueries {
 		Map<String, Object> parametros = new HashMap<>();
 		preencherCondicoesEParametrosString(filtro, condicoes, parametros);
 		if (condicoes.isEmpty()) {
-			condicoes.append(" where l.status = 'Aberto para Lances'");
+			condicoes.append(" where l.status = 'ABERTO'");
 		} else {
-			condicoes.append(" and l.status = 'Aberto para Lances'");
+			condicoes.append(" and l.status = 'ABERTO'");
 		}
 		queryLeiloes.append(condicoes);
 		TypedQuery<Leilao> typedQuery = em.createQuery(queryLeiloes.toString(), Leilao.class);
@@ -127,10 +129,20 @@ public class LeilaoQueriesImpl implements LeilaoQueries {
 		}
 		if (filtro.getGado() != null) {
 			PaginacaoUtil.fazerLigacaoCondicoes(condicoes, condicao);
-			condicoes.append("g.gado = :gado");
+			condicoes.append("l.gado = :gado");
 			parametros.put("gado", filtro.getGado());
 			condicao = true;
 		}
+	}
+
+	public void atualizarStatusLeiloes() {
+		String leilaoQuery = "UPDATE Leilao l SET l.status = :novoStatus WHERE l.finalTimestamp < :agora AND l.status = :statusAberto";
+		
+		em.createQuery(leilaoQuery)
+		.setParameter("novoStatus", StatusLeilao.ENCERRADO)
+		.setParameter("agora", LocalDateTime.now())
+		.setParameter("statusAberto", StatusLeilao.ABERTO)
+		.executeUpdate();
 	}
 	
 }

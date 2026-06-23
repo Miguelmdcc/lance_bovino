@@ -7,4 +7,6 @@ import web.lance_bovino.repository.queries.leilao.LeilaoQueries;
 
 public interface LeilaoRepository extends JpaRepository<Leilao, Long>, LeilaoQueries {
 
+    void atualizarStatusLeiloes();
+
 }

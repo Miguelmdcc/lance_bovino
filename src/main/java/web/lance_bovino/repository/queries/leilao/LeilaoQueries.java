@@ -13,5 +13,7 @@ public interface LeilaoQueries {
 	Page<Leilao> pesquisar(LeilaoFilter filtro, Pageable pageable, Long usuarioCodigo);
 
 	List<Leilao> pesquisarGeral(String filtro);
+
+	void atualizarStatusLeiloes();
 	
 }
