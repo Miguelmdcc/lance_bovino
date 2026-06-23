@@ -133,6 +133,12 @@ public class LeilaoQueriesImpl implements LeilaoQueries {
 			parametros.put("gado", filtro.getGado());
 			condicao = true;
 		}
+		if (filtro.getStatus() != null) {
+			PaginacaoUtil.fazerLigacaoCondicoes(condicoes, condicao);
+			condicoes.append("l.status = :status");
+			parametros.put("status", filtro.getStatus());
+			condicao = true;
+		}
 	}
 
 	public void atualizarStatusLeiloes() {

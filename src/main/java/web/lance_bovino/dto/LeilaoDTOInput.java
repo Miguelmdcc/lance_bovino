@@ -137,7 +137,7 @@ public class LeilaoDTOInput {
         return leilao;
     }
 
-    public LeilaoDTOInput fromLeilao(Leilao leilao){
+    public static LeilaoDTOInput fromLeilao(Leilao leilao){
         LeilaoDTOInput leilaoDTOInput = new LeilaoDTOInput();
         leilaoDTOInput.setCodigo(leilao.getCodigo());
         leilaoDTOInput.setNome(leilao.getNome());

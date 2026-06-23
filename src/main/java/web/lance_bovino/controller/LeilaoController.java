@@ -1,5 +1,6 @@
 package web.lance_bovino.controller;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import web.lance_bovino.dto.LeilaoDTOInput;
 import web.lance_bovino.filter.LeilaoFilter;
@@ -62,6 +64,7 @@ public class LeilaoController {
         logger.debug("Gados buscados: {}", gados);
         model.addAttribute("gados", gados);
 		model.addAttribute("leilaoDTOInput", new LeilaoDTOInput());
+		model.addAttribute("statuses",StatusLeilao.values());
         return "leilao/pesquisar_meus_leiloes :: formulario";
     }
 
@@ -138,33 +141,32 @@ public class LeilaoController {
 		}
 	}
 
-	// @PostMapping("/alterar")
-	// public String alterarGado(@Valid GadoDTOInput gado, BindingResult resultado, 
-	// 	RedirectAttributes redirectAttributes, HttpServletResponse response) {
-	// 	if (resultado.hasErrors()) {
-	// 		logger.info("Algum dado do gado recebido para alterar não é válido.");
-	// 		logger.info("Erros encontrados:");
-	// 		for (FieldError erro : resultado.getFieldErrors()) {
-	// 			logger.info("{}", erro);
-	// 		}
-	// 		return "gado/alterar :: formulario";
-	// 	} else {
-	// 		gado.setStatus(Status.ATIVO);
-	// 		gadoService.atualizar(gado.toGado());
-	// 		redirectAttributes.addAttribute("codigo",gado.getCodigo());
-	// 		redirectAttributes.addFlashAttribute("notificacaoSA2", new NotificacaoSweetAlert2("Dados do gado alterados com sucesso.",
-	// 		TipoNotificaoSweetAlert2.SUCCESS, 4000));
+	@PostMapping("/alterar")
+	public String alterarGado(@Valid LeilaoDTOInput leilao, BindingResult resultado, 
+		RedirectAttributes redirectAttributes, HttpServletResponse response) {
+		if (resultado.hasErrors()) {
+			logger.info("Algum dado do leilao recebido para alterar não é válido.");
+			logger.info("Erros encontrados:");
+			for (FieldError erro : resultado.getFieldErrors()) {
+				logger.info("{}", erro);
+			}
+			return "leilao/alterar :: formulario";
+		} else {
+			leilaoService.atualizar(leilao.toLeilao());
+			redirectAttributes.addAttribute("codigo",leilao.getCodigo());
+			redirectAttributes.addFlashAttribute("notificacaoSA2", new NotificacaoSweetAlert2("Dados do leilao alterados com sucesso.",
+			TipoNotificaoSweetAlert2.SUCCESS, 4000));
 			
-	// 		return "redirect:/gado/alterar/{codigo}";
-	// 	}
-	// }
+			return "redirect:/leilao/alterar/{codigo}";
+		}
+	}
     
-	// @GetMapping("/alterar/{codigo}")
-    // public String abrirAlterar(@PathVariable Long codigo, Model model) {
-    //     GadoDTOInput dto = GadoDTOInput.fromGado(gadoService.buscar(codigo));
-    //     model.addAttribute("gadoDTOInput", dto);
-    //     return "gado/alterar :: formulario";
-    // }
+	@GetMapping("/alterar/{codigo}")
+    public String abrirAlterar(@PathVariable Long codigo, Model model) {
+        LeilaoDTOInput dto = LeilaoDTOInput.fromLeilao(leilaoService.buscar(codigo));
+        model.addAttribute("leilaoDTOInput", dto);
+        return "leilao/alterar :: formulario";
+    }
 
 	@GetMapping("/remover/{codigo}")
     public String remover(@PathVariable Long codigo, RedirectAttributes atributos) {
@@ -173,6 +175,27 @@ public class LeilaoController {
 			leilao.setAtivo(false);
 			leilaoService.atualizar(leilao);
 			atributos.addFlashAttribute("notificacaoSA2", new NotificacaoSweetAlert2("Leilao removido com sucesso.",
+				TipoNotificaoSweetAlert2.SUCCESS, 4000));
+        } else {
+			atributos.addFlashAttribute("notificacaoSA2", new NotificacaoSweetAlert2("Não foi encontrado um leilao com esse codigo",
+				TipoNotificaoSweetAlert2.SUCCESS, 4000));
+        }
+        return "redirect:/leilao/pesquisarmeusleiloes";
+    }
+
+	
+	@GetMapping("/ativar/{codigo}")
+    public String ativar(@PathVariable Long codigo, RedirectAttributes atributos) {
+        Leilao leilao = leilaoService.buscar(codigo);
+        if (leilao != null) {
+			if (leilao.getFinalTimestamp().isBefore(LocalDateTime.now())) {
+				atributos.addFlashAttribute("notificacaoSA2", new NotificacaoSweetAlert2("Leilão com data no passado.",
+				TipoNotificaoSweetAlert2.ERROR, 4000));
+				return "redirect:/leilao/pesquisarmeusleiloes";
+			}
+			leilao.setStatus(StatusLeilao.ABERTO);
+			leilaoService.atualizar(leilao);
+			atributos.addFlashAttribute("notificacaoSA2", new NotificacaoSweetAlert2("Leilao aberto com sucesso.",
 				TipoNotificaoSweetAlert2.SUCCESS, 4000));
         } else {
 			atributos.addFlashAttribute("notificacaoSA2", new NotificacaoSweetAlert2("Não foi encontrado um leilao com esse codigo",
