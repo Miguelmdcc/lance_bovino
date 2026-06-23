@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import web.lance_bovino.filter.LeilaoFilter;
 import web.lance_bovino.model.Leilao;
 
 public interface LeilaoQueries {

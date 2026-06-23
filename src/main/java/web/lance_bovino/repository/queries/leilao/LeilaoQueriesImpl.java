@@ -8,59 +8,60 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
-import web.lance_bovino.filter.GadoFilter;
-import web.lance_bovino.model.Gado;
-import web.lance_bovino.pagination.PaginacaoUtil;
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+import web.lance_bovino.filter.LeilaoFilter;
+import web.lance_bovino.model.Leilao;
+import web.lance_bovino.pagination.PaginacaoUtil;
 
 public class LeilaoQueriesImpl implements LeilaoQueries {
 
 	@PersistenceContext
 	private EntityManager em;
 
-   	public Page<Gado> pesquisar(GadoFilter filtro, Pageable pageable, Long usuarioCodigo) {
+   	public Page<Leilao> pesquisar(LeilaoFilter filtro, Pageable pageable, Long usuarioCodigo) {
 
-		StringBuilder queryGados = new StringBuilder("select distinct g from Gado g");
+		StringBuilder queryLeilao = new StringBuilder("select distinct l from Leilao l");
 		StringBuilder condicoes = new StringBuilder();
 		Map<String, Object> parametros = new HashMap<>();
 
 		preencherCondicoesEParametros(filtro, condicoes, parametros);
 
 		if (condicoes.isEmpty()) {
-			condicoes.append(" where g.status = 'ATIVO' and g.usuario.codigo = "+usuarioCodigo);
+			condicoes.append(" where l.status = 'Aberto para Lances' and l.usuario.codigo = "+usuarioCodigo);
 		} else {
-			condicoes.append(" and g.status = 'ATIVO' and g.usuario.codigo = "+usuarioCodigo);
+			condicoes.append(" and l.status = 'Aberto para Lances' and l.usuario.codigo = "+usuarioCodigo);
 		}
 
-		queryGados.append(condicoes);
-		PaginacaoUtil.prepararOrdemJPQL(queryGados, "g", pageable);
-		TypedQuery<Gado> typedQuery = em.createQuery(queryGados.toString(), Gado.class);
+		queryLeilao.append(condicoes);
+		PaginacaoUtil.prepararOrdemJPQL(queryLeilao, "l", pageable);
+		TypedQuery<Leilao> typedQuery = em.createQuery(queryLeilao.toString(), Leilao.class);
 		PaginacaoUtil.prepararIntervalo(typedQuery, pageable);
 		PaginacaoUtil.preencherParametros(parametros, typedQuery);
-		List<Gado> vacinas = typedQuery.getResultList();
+		List<Leilao> leiloes = typedQuery.getResultList();
 
-		long totalGados = PaginacaoUtil.getTotalRegistros("Gado", "g", condicoes, parametros, em);
+		long totalLeiloes = PaginacaoUtil.getTotalRegistros("Leilao", "l", condicoes, parametros, em);
 
-		return new PageImpl<>(vacinas, pageable, totalGados);
+		return new PageImpl<>(leiloes, pageable, totalLeiloes);
 	}
 
-	public List<Gado> pesquisarGeral(String filtro) {
-		StringBuilder queryGados = new StringBuilder("select distinct g from Gado g");
+	public List<Leilao> pesquisarGeral(String filtro) {
+		StringBuilder queryLeiloes = new StringBuilder("select distinct l from Leilao l");
 		StringBuilder condicoes = new StringBuilder();
 		Map<String, Object> parametros = new HashMap<>();
 		preencherCondicoesEParametrosString(filtro, condicoes, parametros);
 		if (condicoes.isEmpty()) {
-			condicoes.append(" where g.status = 'ATIVO'");
+			condicoes.append(" where l.status = 'Aberto para Lances'");
 		} else {
-			condicoes.append(" and g.status = 'ATIVO'");
+			condicoes.append(" and l.status = 'Aberto para Lances'");
 		}
-		queryGados.append(condicoes);
-		TypedQuery<Gado> typedQuery = em.createQuery(queryGados.toString(), Gado.class);
+		queryLeiloes.append(condicoes);
+		TypedQuery<Leilao> typedQuery = em.createQuery(queryLeiloes.toString(), Leilao.class);
 		PaginacaoUtil.preencherParametros(parametros, typedQuery);
-		List<Gado> gados = typedQuery.getResultList();
-		return gados;
+		List<Leilao> leiloes = typedQuery.getResultList();
+		return leiloes;
 	}
 
 	private void preencherCondicoesEParametrosString(String filtro, StringBuilder condicoes,
@@ -74,7 +75,7 @@ public class LeilaoQueriesImpl implements LeilaoQueries {
 				} else {
 					condicoes.append(" or ");
 				}
-				condicoes.append("g.codigo = :codigo");
+				condicoes.append("l.codigo = :codigo");
 				parametros.put("codigo", codigo);
 				condicao = true;
 			} catch (NumberFormatException e) {
@@ -83,51 +84,51 @@ public class LeilaoQueriesImpl implements LeilaoQueries {
 				} else {
 					condicoes.append(" or ");
 				}
-				condicoes.append("lower(g.nome) like :nome");
+				condicoes.append("lower(l.nome) like :nome");
 				parametros.put("nome", "%" + filtro.toLowerCase() + "%");
 				condicao = true;
 			}
 		}
 	}
 
-	private void preencherCondicoesEParametros(GadoFilter filtro, StringBuilder condicoes, Map<String, Object> parametros) {
+	private void preencherCondicoesEParametros(LeilaoFilter filtro, StringBuilder condicoes, Map<String, Object> parametros) {
 		boolean condicao = false;
 
 		if (filtro.getCodigo() != null) {
 			PaginacaoUtil.fazerLigacaoCondicoes(condicoes, condicao);
-			condicoes.append("g.codigo = :codigo");
+			condicoes.append("l.codigo = :codigo");
 			parametros.put("codigo", filtro.getCodigo());
 			condicao = true;
 		}
 		if (StringUtils.hasText(filtro.getNome())) {
 			PaginacaoUtil.fazerLigacaoCondicoes(condicoes, condicao);		
-			condicoes.append("lower(g.nome) like :nome");
+			condicoes.append("lower(l.nome) like :nome");
 			parametros.put("nome", "%" + filtro.getNome().toLowerCase() + "%");
 			condicao = true;
 		}
-		if (filtro.getPeso() != null) {
+		if (filtro.getInitialPrice() != null) {
 			PaginacaoUtil.fazerLigacaoCondicoes(condicoes, condicao);
-			condicoes.append("g.peso = :peso");
-			parametros.put("peso", filtro.getPeso());
+			condicoes.append("l.initial_price = :initial_price");
+			parametros.put("initial_price", filtro.getInitialPrice());
 			condicao = true;
 		}
 
-		if (filtro.getRaca() != null) {
+		if (filtro.getFinalTimestamp() != null) {
 			PaginacaoUtil.fazerLigacaoCondicoes(condicoes, condicao);
-			condicoes.append("g.raca = :raca");
-			parametros.put("raca", filtro.getRaca());
+			condicoes.append("l.final_timestamp = :final_timestamp");
+			parametros.put("final_timestamp", filtro.getFinalTimestamp());
 			condicao = true;
 		}
-		if (filtro.getAltura() != null) {
+		if (filtro.getUsuario() != null) {
 			PaginacaoUtil.fazerLigacaoCondicoes(condicoes, condicao);
-			condicoes.append("g.altura = :altura");
-			parametros.put("altura", filtro.getAltura());
+			condicoes.append("l.usuario = :usuario");
+			parametros.put("usuario", filtro.getUsuario());
 			condicao = true;
 		}
-		if (filtro.getIdade() != null) {
+		if (filtro.getGado() != null) {
 			PaginacaoUtil.fazerLigacaoCondicoes(condicoes, condicao);
-			condicoes.append("g.idade = :idade");
-			parametros.put("idade", filtro.getIdade());
+			condicoes.append("g.gado = :gado");
+			parametros.put("gado", filtro.getGado());
 			condicao = true;
 		}
 	}

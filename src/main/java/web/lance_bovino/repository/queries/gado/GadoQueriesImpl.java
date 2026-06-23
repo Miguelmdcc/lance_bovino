@@ -39,11 +39,11 @@ public class GadoQueriesImpl implements GadoQueries {
 		TypedQuery<Gado> typedQuery = em.createQuery(queryGados.toString(), Gado.class);
 		PaginacaoUtil.prepararIntervalo(typedQuery, pageable);
 		PaginacaoUtil.preencherParametros(parametros, typedQuery);
-		List<Gado> vacinas = typedQuery.getResultList();
+		List<Gado> gados = typedQuery.getResultList();
 
 		long totalGados = PaginacaoUtil.getTotalRegistros("Gado", "g", condicoes, parametros, em);
 
-		return new PageImpl<>(vacinas, pageable, totalGados);
+		return new PageImpl<>(gados, pageable, totalGados);
 	}
 
 	public List<Gado> pesquisarGeral(String filtro) {

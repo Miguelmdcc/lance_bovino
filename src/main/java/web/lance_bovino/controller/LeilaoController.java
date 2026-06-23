@@ -24,6 +24,7 @@ import web.lance_bovino.notification.NotificacaoSweetAlert2;
 import web.lance_bovino.notification.TipoNotificaoSweetAlert2;
 import web.lance_bovino.repository.UsuarioRepository;
 import web.lance_bovino.service.GadoService;
+import web.lance_bovino.service.LeilaoService;
 
 
 @Controller
@@ -34,10 +35,14 @@ public class LeilaoController {
 
     private UsuarioRepository usuarioRepository;
 	private GadoService gadoService;
+	private LeilaoService leilaoService;
 	
-	public LeilaoController(UsuarioRepository usuarioRepository, GadoService gadoService) {
+	public LeilaoController(UsuarioRepository usuarioRepository, GadoService gadoService,
+		LeilaoService leilaoService
+	) {
         this.usuarioRepository = usuarioRepository;
 		this.gadoService = gadoService;
+		this.leilaoService = leilaoService;
 	}
 
 	// @GetMapping("/abrirpesquisar")
@@ -99,7 +104,8 @@ public class LeilaoController {
                     TipoNotificaoSweetAlert2.ERROR, 4000));
                 return "gado/cadastrar :: formulario";
             }
-			leilao.salvar(leilao.toLeilao());
+			leilao.setUsuario(usuario);
+			leilaoService.salvar(leilao.toLeilao());
 			redirectAttributes.addFlashAttribute("notificacaoSA2", new NotificacaoSweetAlert2("Cadastro de gado efetuado com sucesso.",
                     TipoNotificaoSweetAlert2.SUCCESS, 4000));
 			return "redirect:/leilao/cadastrar";
