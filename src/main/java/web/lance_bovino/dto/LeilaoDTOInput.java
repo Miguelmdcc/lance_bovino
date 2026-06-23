@@ -133,6 +133,7 @@ public class LeilaoDTOInput {
         leilao.setUsuario(usuario);
         leilao.setGado(gado);
         leilao.setStatus(status);
+        leilao.setAtivo(true);
         return leilao;
     }
 

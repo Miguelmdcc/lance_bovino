@@ -50,66 +50,107 @@ public class Leilao implements Serializable {
     @Enumerated(EnumType.STRING)
     private StatusLeilao status = StatusLeilao.AGUARDANDO;
 
+    private boolean ativo;
+
     public Long getCodigo() {
         return codigo;
     }
+
+
 
     public void setCodigo(Long codigo) {
         this.codigo = codigo;
     }
 
+
+
     public String getNome() {
         return nome;
     }
+
+
 
     public void setNome(String nome) {
         this.nome = nome;
     }
 
+
+
     public BigDecimal getInitialPrice() {
         return initialPrice;
     }
+
+
 
     public void setInitialPrice(BigDecimal initialPrice) {
         this.initialPrice = initialPrice;
     }
 
+
+
     public LocalDateTime getFinalTimestamp() {
         return finalTimestamp;
     }
+
+
 
     public void setFinalTimestamp(LocalDateTime finalTimestamp) {
         this.finalTimestamp = finalTimestamp;
     }
 
+
+
     public Usuario getUsuario() {
         return usuario;
     }
+
+
 
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
     }
 
+
+
     public Gado getGado() {
         return gado;
     }
+
+
 
     public void setGado(Gado gado) {
         this.gado = gado;
     }
 
+
+
     public StatusLeilao getStatus() {
         return status;
     }
+
+
 
     public void setStatus(StatusLeilao status) {
         this.status = status;
     }
 
+
+
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
+    }
+
     @Override
     public String toString() {
         return "Leilao [codigo=" + codigo + ", nome=" + nome + ", initialPrice=" + initialPrice + ", finalTimestamp="
-                + finalTimestamp + ", usuario=" + usuario + ", gado=" + gado + ", status=" + status + "]";
+                + finalTimestamp + ", usuario=" + usuario + ", gado=" + gado + ", status=" + status + ", ativo=" + ativo
+                + "]";
     }
 
 }

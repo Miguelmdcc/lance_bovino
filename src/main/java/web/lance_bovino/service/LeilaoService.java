@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import web.lance_bovino.filter.LeilaoFilter;
 import web.lance_bovino.model.Leilao;
 import web.lance_bovino.model.Status;
+import web.lance_bovino.model.StatusLeilao;
 import web.lance_bovino.repository.LeilaoRepository;
 
 @Service 
@@ -57,11 +58,11 @@ public class LeilaoService {
         leilaoRepository.save(leilao); 
     } 
 
-    // @Transactional(readOnly = true)
-    // public Leilao buscar(Long codigo) {
-    //     logger.info("Buscando o leilao com código: {}", codigo);
-    //     return leilaoRepository.findByCodigoAndStatus(codigo, Status.ATIVO).orElse(null);
-    // }
+    @Transactional(readOnly = true)
+    public Leilao buscar(Long codigo) {
+        logger.info("Buscando o leilao com código: {}", codigo);
+        return leilaoRepository.findByCodigoAndStatus(codigo, StatusLeilao.AGUARDANDO);
+    }
 
     @Transactional(readOnly = true)
     public List<Leilao> pesquisarGeral(String busca) {

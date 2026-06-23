@@ -16,6 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -165,19 +166,19 @@ public class LeilaoController {
     //     return "gado/alterar :: formulario";
     // }
 
-	// @GetMapping("/remover/{codigo}")
-    // public String remover(@PathVariable Long codigo, RedirectAttributes atributos) {
-    //     Gado gado = gadoService.buscar(codigo);
-    //     if (gado != null) {
-	// 		gado.setStatus(Status.INATIVO);
-	// 		gadoService.atualizar(gado);
-	// 		atributos.addFlashAttribute("notificacaoSA2", new NotificacaoSweetAlert2("Gado removido com sucesso.",
-	// 			TipoNotificaoSweetAlert2.SUCCESS, 4000));
-    //     } else {
-	// 		atributos.addFlashAttribute("notificacaoSA2", new NotificacaoSweetAlert2("Não foi encontrado um gado com esse codigo",
-	// 			TipoNotificaoSweetAlert2.SUCCESS, 4000));
-    //     }
-    //     return "redirect:/gado/pesquisar";
-    // }
+	@GetMapping("/remover/{codigo}")
+    public String remover(@PathVariable Long codigo, RedirectAttributes atributos) {
+        Leilao leilao = leilaoService.buscar(codigo);
+        if (leilao != null) {
+			leilao.setAtivo(false);
+			leilaoService.atualizar(leilao);
+			atributos.addFlashAttribute("notificacaoSA2", new NotificacaoSweetAlert2("Leilao removido com sucesso.",
+				TipoNotificaoSweetAlert2.SUCCESS, 4000));
+        } else {
+			atributos.addFlashAttribute("notificacaoSA2", new NotificacaoSweetAlert2("Não foi encontrado um leilao com esse codigo",
+				TipoNotificaoSweetAlert2.SUCCESS, 4000));
+        }
+        return "redirect:/leilao/pesquisarmeusleiloes";
+    }
 	
 }

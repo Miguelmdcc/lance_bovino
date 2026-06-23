@@ -32,9 +32,9 @@ public class LeilaoQueriesImpl implements LeilaoQueries {
 		preencherCondicoesEParametros(filtro, condicoes, parametros);
 
 		if (condicoes.isEmpty()) {
-			condicoes.append(" where l.usuario.codigo = "+usuarioCodigo);
+			condicoes.append(" where l.ativo = true and l.usuario.codigo = "+usuarioCodigo);
 		} else {
-			condicoes.append(" and l.usuario.codigo = "+usuarioCodigo);
+			condicoes.append(" and l.ativo = true and l.usuario.codigo = "+usuarioCodigo);
 		}
 
 		queryLeilao.append(condicoes);
@@ -55,9 +55,9 @@ public class LeilaoQueriesImpl implements LeilaoQueries {
 		Map<String, Object> parametros = new HashMap<>();
 		preencherCondicoesEParametrosString(filtro, condicoes, parametros);
 		if (condicoes.isEmpty()) {
-			condicoes.append(" where l.status = 'ABERTO'");
+			condicoes.append(" where l.ativo = true and l.status = 'ABERTO'");
 		} else {
-			condicoes.append(" and l.status = 'ABERTO'");
+			condicoes.append(" and l.ativo = true and l.status = 'ABERTO'");
 		}
 		queryLeiloes.append(condicoes);
 		TypedQuery<Leilao> typedQuery = em.createQuery(queryLeiloes.toString(), Leilao.class);
