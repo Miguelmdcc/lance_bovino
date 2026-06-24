@@ -4,6 +4,7 @@ CREATE TABLE public.gado_history
     codigo_gado bigserial NOT NULL,
     codigo_usuario bigserial NOT NULL,
     timestamp_de_criacao timestamp NOT NULL, 
+    ativo boolean DEFAULT true,
     PRIMARY KEY (codigo),
     CONSTRAINT fk_usuario FOREIGN KEY (codigo_usuario) REFERENCES public.usuario(codigo),
     CONSTRAINT fk_gado FOREIGN KEY (codigo_gado) REFERENCES public.gado(codigo)
