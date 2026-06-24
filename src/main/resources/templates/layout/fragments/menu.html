@@ -26,6 +26,31 @@
     </div>
 
     <!-- 2o Item Menu -->
+    <div x-data="{ open: false }">
+      <button th:replace="~{components/menu-item-button :: menu-item-button('Leilão', ~{::#lote-icon})}"></button>
+
+      <!-- Opcoes do 1o Item Menu -->
+      <div x-show="open" class="space-y-4 ps-10">
+        <!-- 1a Opcao -->
+        <div
+          th:replace="~{components/menu-item-option :: menu-item-option('Criar leilão', @{/leilao/cadastrar}, ~{::#cadastrar-icon})}">
+        </div>
+        <!-- 2a Opcao -->
+        <div
+          th:replace="~{components/menu-item-option :: menu-item-option('Meus leilões', @{/leilao/abrirpesquisarmeusleiloes}, ~{::#pesquisar-icon})}">
+        </div>
+        <!-- 3a Opcao -->
+        <div
+          th:replace="~{components/menu-item-option :: menu-item-option('Meus lances', @{/leilao/abrirpesquisarmeuslances}, ~{::#pesquisar-icon})}">
+        </div>
+        <!-- 4a Opcao -->
+        <div
+          th:replace="~{components/menu-item-option :: menu-item-option('Leilões abertos', @{/leilao/abrirpesquisar}, ~{::#pesquisar-icon})}">
+        </div>
+      </div>
+    </div>
+
+    <!-- 3o Item Menu -->
     <div x-data="{ open: false }" sec:authorize="hasRole('ROLE_ADMIN')">
       <button th:replace="~{components/menu-item-button :: menu-item-button('ADMIN', ~{::#pessoa-icon})}"></button>
 

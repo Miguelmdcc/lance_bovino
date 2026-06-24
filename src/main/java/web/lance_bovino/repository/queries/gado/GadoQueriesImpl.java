@@ -39,11 +39,73 @@ public class GadoQueriesImpl implements GadoQueries {
 		TypedQuery<Gado> typedQuery = em.createQuery(queryGados.toString(), Gado.class);
 		PaginacaoUtil.prepararIntervalo(typedQuery, pageable);
 		PaginacaoUtil.preencherParametros(parametros, typedQuery);
-		List<Gado> vacinas = typedQuery.getResultList();
+		List<Gado> gados = typedQuery.getResultList();
 
 		long totalGados = PaginacaoUtil.getTotalRegistros("Gado", "g", condicoes, parametros, em);
 
-		return new PageImpl<>(vacinas, pageable, totalGados);
+		return new PageImpl<>(gados, pageable, totalGados);
+	}
+
+	public List<Gado> pesquisarGeral(String filtro, Long codigo_usuario) {
+		StringBuilder queryGados = new StringBuilder("select distinct g from Gado g");
+		StringBuilder condicoes = new StringBuilder();
+		Map<String, Object> parametros = new HashMap<>();
+		preencherCondicoesEParametrosString(filtro, condicoes, parametros);
+		if (condicoes.isEmpty()) {
+			condicoes.append(" where g.status = 'ATIVO' and g.usuario.codigo = "+codigo_usuario);
+		} else {
+			condicoes.append(" and g.status = 'ATIVO' and g.usuario.codigo = "+codigo_usuario);
+		}
+		queryGados.append(condicoes);
+		TypedQuery<Gado> typedQuery = em.createQuery(queryGados.toString(), Gado.class);
+		PaginacaoUtil.preencherParametros(parametros, typedQuery);
+		List<Gado> gados = typedQuery.getResultList();
+		return gados;
+	}
+
+	public List<Gado> pesquisarGeralNotInLeilao(String filtro, Long codigo_usuario) {
+		StringBuilder queryGados = new StringBuilder("select distinct g from Gado g");
+		StringBuilder condicoes = new StringBuilder();
+		Map<String, Object> parametros = new HashMap<>();
+		preencherCondicoesEParametrosString(filtro, condicoes, parametros);
+		if (condicoes.isEmpty()) {
+			condicoes.append(" where g.status = 'ATIVO' and g.usuario.codigo = "+codigo_usuario);
+		} else {
+			condicoes.append(" and g.status = 'ATIVO' and g.usuario.codigo = "+codigo_usuario);
+		}
+		condicoes.append(" and g.codigo NOT IN (select l.gado.codigo from Leilao l where l.status != 'ENCERRADO')");
+		queryGados.append(condicoes);
+		TypedQuery<Gado> typedQuery = em.createQuery(queryGados.toString(), Gado.class);
+		PaginacaoUtil.preencherParametros(parametros, typedQuery);
+		List<Gado> gados = typedQuery.getResultList();
+		return gados;
+	}
+
+	private void preencherCondicoesEParametrosString(String filtro, StringBuilder condicoes,
+			Map<String, Object> parametros) {
+		if(filtro != null){
+			boolean condicao = false;
+			try {
+				Long codigo = Long.parseLong(filtro);
+				if (!condicao) {
+					condicoes.append(" where ");
+				} else {
+					condicoes.append(" or ");
+				}
+				condicoes.append("g.codigo = :codigo");
+				parametros.put("codigo", codigo);
+				condicao = true;
+			} catch (NumberFormatException e) {
+				if (!condicao) {
+					condicoes.append(" where ");
+				} else {
+					condicoes.append(" or ");
+				}
+				condicoes.append("lower(g.nome) like :nome");
+				parametros.put("nome", "%" + filtro.toLowerCase() + "%");
+				condicao = true;
+			}
+		}
 	}
 
 	private void preencherCondicoesEParametros(GadoFilter filtro, StringBuilder condicoes, Map<String, Object> parametros) {

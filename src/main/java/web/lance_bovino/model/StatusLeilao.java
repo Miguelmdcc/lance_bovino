@@ -6,7 +6,7 @@ public enum StatusLeilao {
     ENCERRADO("Encerrado", Status.INATIVO);
 
     private final String descricao;
-    private final Status statusDoSistema; // Vincula com o seu Status.java
+    private final Status statusDoSistema;
 
     private StatusLeilao(String descricao, Status statusDoSistema) {
         this.descricao = descricao;
@@ -21,8 +21,3 @@ public enum StatusLeilao {
         return statusDoSistema;
     }
 }
-
-//Info:
-//if (leilao.getStatus().getStatusDoSistema() == Status.ATIVO) {
-    // Significa que o leilão ainda está tramitando (ou esperando ou aberto)
-//}
