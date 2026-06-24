@@ -81,6 +81,32 @@ public class GadoQueriesImpl implements GadoQueries {
 		return gados;
 	}
 
+	public Page<Gado> pesquisarTodos(GadoFilter filtro, Pageable pageable) {
+
+		StringBuilder queryGados = new StringBuilder("select distinct g from Gado g");
+		StringBuilder condicoes = new StringBuilder();
+		Map<String, Object> parametros = new HashMap<>();
+
+		preencherCondicoesEParametros(filtro, condicoes, parametros);
+
+		if (condicoes.isEmpty()) {
+			condicoes.append(" where g.status = 'ATIVO'");
+		} else {
+			condicoes.append(" and g.status = 'ATIVO'");
+		}
+
+		queryGados.append(condicoes);
+		PaginacaoUtil.prepararOrdemJPQL(queryGados, "g", pageable);
+		TypedQuery<Gado> typedQuery = em.createQuery(queryGados.toString(), Gado.class);
+		PaginacaoUtil.prepararIntervalo(typedQuery, pageable);
+		PaginacaoUtil.preencherParametros(parametros, typedQuery);
+		List<Gado> gados = typedQuery.getResultList();
+
+		long totalGados = PaginacaoUtil.getTotalRegistros("Gado", "g", condicoes, parametros, em);
+
+		return new PageImpl<>(gados, pageable, totalGados);
+	}
+
 	private void preencherCondicoesEParametrosString(String filtro, StringBuilder condicoes,
 			Map<String, Object> parametros) {
 		if(filtro != null){

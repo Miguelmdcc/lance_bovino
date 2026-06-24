@@ -70,6 +70,22 @@ public class GadoController {
         return "gado/mostrar :: tabela";
     }
 
+	@GetMapping("/abrirpesquisarrelatorio")
+    public String abrirPesquisaRelatorio(Model model) {
+        return "gado/pesquisar_relatorio :: formulario";
+    }
+
+    @GetMapping("/pesquisarrelatorio")
+    public String pesquisarRelatorio(GadoFilter filtro, Model model,
+            @PageableDefault(size = 9) @SortDefault(sort = "codigo",
+                    direction = Sort.Direction.ASC) Pageable pageable,
+            HttpServletRequest request) {
+        Page<Gado> pagina = gadoService.pesquisarTodos(filtro, pageable);
+        PageWrapper<Gado> paginaWrapper = new PageWrapper<>(pagina, request);
+        model.addAttribute("pagina", paginaWrapper);
+        return "gado/mostrar_relatorio :: tabela";
+    }
+
 	@GetMapping("/cadastrar")
 	public String abrirCadastroGado(GadoDTOInput gado, Model model) {
 		return "gado/cadastrar :: formulario";

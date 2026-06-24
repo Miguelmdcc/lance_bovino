@@ -52,6 +52,19 @@
 
     <!-- 3o Item Menu -->
     <div x-data="{ open: false }" sec:authorize="hasRole('ROLE_ADMIN')">
+      <button th:replace="~{components/menu-item-button :: menu-item-button('Historico de Gados', ~{::#relatorios-icon})}"></button>
+
+      <!-- Opcoes do 1o Item Menu -->
+      <div x-show="open" class="space-y-4 ps-10">
+        <!-- 1a Opcao -->
+        <div
+          th:replace="~{components/menu-item-option :: menu-item-option('Pesquisar', @{/gado/abrirpesquisarrelatorio}, ~{::#pesquisar-icon})}">
+        </div>
+      </div>
+    </div>
+
+    <!-- 4o Item Menu -->
+    <div x-data="{ open: false }" sec:authorize="hasRole('ROLE_ADMIN')">
       <button th:replace="~{components/menu-item-button :: menu-item-button('ADMIN', ~{::#pessoa-icon})}"></button>
 
       <!-- Opcoes do 1o Item Menu -->
