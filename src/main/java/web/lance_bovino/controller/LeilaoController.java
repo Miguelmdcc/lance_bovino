@@ -58,7 +58,7 @@ public class LeilaoController {
 	}
 
 	@GetMapping("/abrirpesquisarmeusleiloes")
-    public String abrirPesquisa(String gadoBusca, Model model, @AuthenticationPrincipal UserDetails userDetails) {
+    public String abrirPesquisaMeusLeiloes(String gadoBusca, Model model, @AuthenticationPrincipal UserDetails userDetails) {
 		Long codigo_usuario = usuarioRepository.findByNome(userDetails.getUsername()).getCodigo();
         List<Gado> gados = gadoService.pesquisarGeral(gadoBusca, codigo_usuario);
         logger.debug("Gados buscados: {}", gados);
@@ -69,7 +69,7 @@ public class LeilaoController {
     }
 
     @GetMapping("/pesquisarmeusleiloes")
-    public String pesquisar(LeilaoFilter filtro, Model model,
+    public String pesquisarMeusLeiloes(LeilaoFilter filtro, Model model,
             @PageableDefault(size = 9) @SortDefault(sort = "codigo",
                     direction = Sort.Direction.ASC) Pageable pageable,
             HttpServletRequest request,@AuthenticationPrincipal UserDetails userDetails) {
@@ -80,6 +80,27 @@ public class LeilaoController {
         model.addAttribute("pagina", paginaWrapper);
 		model.addAttribute("status",StatusLeilao.values());
         return "leilao/mostrar_meus_leiloes :: tabela";
+    }
+
+	@GetMapping("/abrirpesquisar")
+    public String abrirPesquisa(String gadoBusca, Model model, @AuthenticationPrincipal UserDetails userDetails) {
+		model.addAttribute("leilaoDTOInput", new LeilaoDTOInput());
+		model.addAttribute("statuses",StatusLeilao.values());
+        return "leilao/pesquisar :: formulario";
+    }
+
+    @GetMapping("/pesquisar")
+    public String pesquisar(LeilaoFilter filtro, Model model,
+            @PageableDefault(size = 9) @SortDefault(sort = "codigo",
+                    direction = Sort.Direction.ASC) Pageable pageable,
+            HttpServletRequest request,@AuthenticationPrincipal UserDetails userDetails) {
+		Long usuarioCodigo = usuarioRepository.findByNome(userDetails.getUsername()).getCodigo();
+        Page<Leilao> pagina = leilaoService.pesquisarLeiloes(filtro, pageable, usuarioCodigo);
+        logger.info("Leiloes do usuario {} pesquisados: {}", userDetails.getUsername(), pagina.getContent());
+        PageWrapper<Leilao> paginaWrapper = new PageWrapper<>(pagina, request);
+        model.addAttribute("pagina", paginaWrapper);
+		model.addAttribute("status",StatusLeilao.values());
+        return "leilao/mostrar :: tabela";
     }
 
 	@GetMapping("/cadastrar")

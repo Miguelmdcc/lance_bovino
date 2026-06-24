@@ -33,12 +33,12 @@ public class LeilaoService {
         return leilaoRepository.pesquisar(filtro, pageable, usuarioCodigo);
     }
 
-    // @Transactional
-    // public Page<Leilao> pesquisarLeiloes(LeilaoFilter filtro, Pageable pageable, Long usuarioCodigo) {
-    //     logger.info("Pesquisando leilões com o filtro {}", filtro);
-    //     leilaoRepository.atualizarStatusLeiloes();
-    //     return leilaoRepository.pesquisarLeiloes(filtro, pageable, usuarioCodigo);
-    // }
+    @Transactional
+    public Page<Leilao> pesquisarLeiloes(LeilaoFilter filtro, Pageable pageable, Long usuarioCodigo) {
+        logger.info("Pesquisando leilões com o filtro {}", filtro);
+        leilaoRepository.atualizarStatusLeiloes();
+        return leilaoRepository.pesquisarLeiloes(filtro, pageable, usuarioCodigo);
+    }
 
     @Transactional
     public void atualizarStatusLeiloes(){

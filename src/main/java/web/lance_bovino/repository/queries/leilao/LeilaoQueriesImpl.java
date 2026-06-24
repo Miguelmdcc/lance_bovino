@@ -110,8 +110,8 @@ public class LeilaoQueriesImpl implements LeilaoQueries {
 		}
 		if (filtro.getInitialPrice() != null) {
 			PaginacaoUtil.fazerLigacaoCondicoes(condicoes, condicao);
-			condicoes.append("l.initial_price = :initial_price");
-			parametros.put("initial_price", filtro.getInitialPrice());
+			condicoes.append("l.initialPrice = :initialPrice");
+			parametros.put("initialPrice", filtro.getInitialPrice());
 			condicao = true;
 		}
 
@@ -149,6 +149,32 @@ public class LeilaoQueriesImpl implements LeilaoQueries {
 		.setParameter("agora", LocalDateTime.now())
 		.setParameter("statusAberto", StatusLeilao.ABERTO)
 		.executeUpdate();
+	}
+
+	public Page<Leilao> pesquisarLeiloes(LeilaoFilter filtro, Pageable pageable, Long usuarioCodigo) {
+
+		StringBuilder queryLeilao = new StringBuilder("select distinct l from Leilao l");
+		StringBuilder condicoes = new StringBuilder();
+		Map<String, Object> parametros = new HashMap<>();
+
+		preencherCondicoesEParametros(filtro, condicoes, parametros);
+
+		if (condicoes.isEmpty()) {
+			condicoes.append(" where l.ativo = true and l.status = 'ABERTO' and l.usuario.codigo != "+usuarioCodigo);
+		} else {
+			condicoes.append(" and l.ativo = true and l.status = 'ABERTO' and l.usuario.codigo != "+usuarioCodigo);
+		}
+
+		queryLeilao.append(condicoes);
+		PaginacaoUtil.prepararOrdemJPQL(queryLeilao, "l", pageable);
+		TypedQuery<Leilao> typedQuery = em.createQuery(queryLeilao.toString(), Leilao.class);
+		PaginacaoUtil.prepararIntervalo(typedQuery, pageable);
+		PaginacaoUtil.preencherParametros(parametros, typedQuery);
+		List<Leilao> leiloes = typedQuery.getResultList();
+
+		long totalLeiloes = PaginacaoUtil.getTotalRegistros("Leilao", "l", condicoes, parametros, em);
+
+		return new PageImpl<>(leiloes, pageable, totalLeiloes);
 	}
 	
 }
