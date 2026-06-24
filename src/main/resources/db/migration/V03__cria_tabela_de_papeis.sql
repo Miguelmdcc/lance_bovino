@@ -24,10 +24,6 @@ ALTER TABLE public.usuario_papel
     REFERENCES public.papel (codigo)
     NOT VALID;
 
-INSERT INTO public.usuario (nome, cpf, metodo_bancario, dados_bancarios, senha) VALUES
-('Teste USER', 123654789, 'PIX','450cvv','{noop}12345'),
-('Teste USEReADM', 123654789, 'PIX','450cvv','{noop}12345');
-
 INSERT INTO public.papel (codigo, nome) VALUES 
 (1, 'ROLE_ADMIN'),
 (2, 'ROLE_USUARIO');

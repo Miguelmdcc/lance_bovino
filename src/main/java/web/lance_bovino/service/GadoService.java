@@ -64,4 +64,10 @@ public class GadoService {
     public List<Gado> pesquisarGeralNotInLeilao(String busca, Long codigo_usuario) {
         return gadoRepository.pesquisarGeralNotInLeilao(busca, codigo_usuario);
     }
+
+    @Transactional(readOnly = true)
+    public Page<Gado> pesquisarTodos(GadoFilter filtro, Pageable pageable) {
+        logger.info("Pesquisando gados com o filtro {}", filtro);
+        return gadoRepository.pesquisarTodos(filtro, pageable);
+    }
 } 

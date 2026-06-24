@@ -1,5 +1,7 @@
 package web.lance_bovino.controller;
 
+import java.time.LocalDateTime;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -25,6 +27,7 @@ import jakarta.validation.Valid;
 import web.lance_bovino.dto.GadoDTOInput;
 import web.lance_bovino.filter.GadoFilter;
 import web.lance_bovino.model.Gado;
+import web.lance_bovino.model.GadoHistory;
 import web.lance_bovino.model.Status;
 import web.lance_bovino.model.Usuario;
 import web.lance_bovino.notification.NotificacaoSweetAlert2;
@@ -32,6 +35,7 @@ import web.lance_bovino.notification.TipoNotificaoSweetAlert2;
 import web.lance_bovino.pagination.PageWrapper;
 import web.lance_bovino.repository.GadoRepository;
 import web.lance_bovino.repository.UsuarioRepository;
+import web.lance_bovino.service.GadoHistoryService;
 import web.lance_bovino.service.GadoService;
 
 
@@ -42,14 +46,14 @@ public class GadoController {
 	private static final Logger logger = LoggerFactory.getLogger(GadoController.class);
 	
 	private GadoService gadoService;
-	private GadoRepository gadoRepository;
     private UsuarioRepository usuarioRepository;
+	private GadoHistoryService gadoHistoryService;
 	
-	public GadoController(GadoService gadoService,
-			GadoRepository gadoRepository, UsuarioRepository usuarioRepository) {
+	public GadoController(GadoService gadoService, UsuarioRepository usuarioRepository
+		,GadoHistoryService gadoHistoryService) {
 		this.gadoService = gadoService;
-		this.gadoRepository = gadoRepository;
         this.usuarioRepository = usuarioRepository;
+		this.gadoHistoryService = gadoHistoryService;
 	}
 
 	@GetMapping("/abrirpesquisar")
@@ -68,6 +72,22 @@ public class GadoController {
         PageWrapper<Gado> paginaWrapper = new PageWrapper<>(pagina, request);
         model.addAttribute("pagina", paginaWrapper);
         return "gado/mostrar :: tabela";
+    }
+
+	@GetMapping("/abrirpesquisarrelatorio")
+    public String abrirPesquisaRelatorio(Model model) {
+        return "gado/pesquisar_relatorio :: formulario";
+    }
+
+    @GetMapping("/pesquisarrelatorio")
+    public String pesquisarRelatorio(GadoFilter filtro, Model model,
+            @PageableDefault(size = 9) @SortDefault(sort = "codigo",
+                    direction = Sort.Direction.ASC) Pageable pageable,
+            HttpServletRequest request) {
+        Page<Gado> pagina = gadoService.pesquisarTodos(filtro, pageable);
+        PageWrapper<Gado> paginaWrapper = new PageWrapper<>(pagina, request);
+        model.addAttribute("pagina", paginaWrapper);
+        return "gado/mostrar_relatorio :: tabela";
     }
 
 	@GetMapping("/cadastrar")
@@ -96,7 +116,14 @@ public class GadoController {
                 return "gado/cadastrar :: formulario";
             }
             gado.setCodigoUsuario(usuario.getCodigo());;
-			gadoService.salvar(gado.toGado());
+			Gado gado_model = gado.toGado();
+			gadoService.salvar(gado_model);
+			GadoHistory gadoHistory = new GadoHistory();
+			gadoHistory.setGado(gado_model);
+			gadoHistory.setUsuario(usuario);
+			gadoHistory.setAtivo(true);
+			gadoHistory.setTimestampDeCriacao(LocalDateTime.now());
+			gadoHistoryService.salvar(gadoHistory);
 			redirectAttributes.addFlashAttribute("notificacaoSA2", new NotificacaoSweetAlert2("Cadastro de gado efetuado com sucesso.",
                     TipoNotificaoSweetAlert2.SUCCESS, 4000));
 			return "redirect:/gado/cadastrar";
@@ -132,11 +159,18 @@ public class GadoController {
     }
 
 	@GetMapping("/remover/{codigo}")
-    public String remover(@PathVariable Long codigo, RedirectAttributes atributos) {
+    public String remover(@PathVariable Long codigo, RedirectAttributes atributos,@AuthenticationPrincipal UserDetails userDetails) {
         Gado gado = gadoService.buscar(codigo);
         if (gado != null) {
 			gado.setStatus(Status.INATIVO);
 			gadoService.atualizar(gado);
+			Usuario usuario = usuarioRepository.findByNome(userDetails.getUsername());
+			GadoHistory gadoHistory = new GadoHistory();
+			gadoHistory.setGado(gado);
+			gadoHistory.setUsuario(usuario);
+			gadoHistory.setAtivo(false);
+			gadoHistory.setTimestampDeCriacao(LocalDateTime.now());
+			gadoHistoryService.salvar(gadoHistory);
 			atributos.addFlashAttribute("notificacaoSA2", new NotificacaoSweetAlert2("Gado removido com sucesso.",
 				TipoNotificaoSweetAlert2.SUCCESS, 4000));
         } else {

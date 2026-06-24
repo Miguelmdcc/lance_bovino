@@ -15,5 +15,7 @@ public interface GadoQueries {
 	List<Gado> pesquisarGeral(String filtro, Long codigo_usuario);
 
 	List<Gado> pesquisarGeralNotInLeilao(String filtro, Long codigo_usuario);
+
+	Page<Gado> pesquisarTodos(GadoFilter filtro, Pageable pageable);
 	
 }
