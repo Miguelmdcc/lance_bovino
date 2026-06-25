@@ -16,6 +16,6 @@ public class RelatoriosService {
     }
 
     public byte[] gerarRelatorioTodosGados() {
-        return jaspersoftUtil.gerarRelatorio("/relatorios/relatoriogadoscompleto.jasper", null, dataSource);
+        return jaspersoftUtil.gerarRelatorio("/relatorios/gado.jasper", null, dataSource);
     }
 }
