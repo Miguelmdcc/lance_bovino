@@ -238,13 +238,16 @@ public class LeilaoController {
 
 	@PostMapping("/lance/salvar")
 	public String salvarLanceNovo(Long leilaoCodigo, java.math.BigDecimal valorLance, 
-								@AuthenticationPrincipal UserDetails userDetails, 
-								Model model, Pageable pageable, HttpServletRequest request,
-							HttpServletResponse response) {
-		
-		Usuario usuario = usuarioRepository.findByNome(userDetails.getUsername());
-		Leilao leilao = leilaoService.buscar(leilaoCodigo);
-		if (valorLance == null || valorLance.compareTo(leilao.getInitialPrice()) < 0) {
+                            @AuthenticationPrincipal UserDetails userDetails, 
+                            Model model, 
+                            @PageableDefault(size = 9) @SortDefault(sort = "codigo", direction = Sort.Direction.ASC) Pageable pageable, // 🔍 CORREÇÃO 1: Mantém o padrão de 9 itens
+                            HttpServletRequest request,
+                            HttpServletResponse response) {
+    
+    Usuario usuario = usuarioRepository.findByNome(userDetails.getUsername());
+    Leilao leilao = leilaoService.buscar(leilaoCodigo);
+    
+    if (valorLance == null || valorLance.compareTo(leilao.getInitialPrice()) < 0) {
         model.addAttribute("leilao", leilao);
         model.addAttribute("erroLance", "O seu lance não pode ser menor que o lance inicial de R$ " + leilao.getInitialPrice());
         
@@ -252,21 +255,26 @@ public class LeilaoController {
         response.setHeader("HX-Reswap", "innerHTML");
         
         return "leilao/modal_lance :: modal"; 
-    	}
-		LeilaoBidHistory lance = new LeilaoBidHistory();
-		lance.setLeilao(leilao);
-		lance.setUsuario(usuario);
-		lance.setBidValue(valorLance);
-		lance.setTimestampDeCriacao(LocalDateTime.now());
-		leilaoBidHistoryService.salvar(lance);
-		
-		logger.info("Usuário {} deu um lance de R$ {} no leilão {}", usuario.getNome(), valorLance, leilao.getNome());
+    }
+    
+    LeilaoBidHistory lance = new LeilaoBidHistory();
+    lance.setLeilao(leilao);
+    lance.setUsuario(usuario);
+    lance.setBidValue(valorLance);
+    lance.setTimestampDeCriacao(LocalDateTime.now());
+    leilaoBidHistoryService.salvar(lance);
+    
+    logger.info("Usuário {} deu um lance de R$ {} no leilão {}", usuario.getNome(), valorLance, leilao.getNome());
 
-		Page<Leilao> pagina = leilaoService.pesquisarUsuario(new LeilaoFilter(), pageable, usuario.getCodigo());
-		web.lance_bovino.pagination.PageWrapper<Leilao> paginaWrapper = new web.lance_bovino.pagination.PageWrapper<>(pagina, request);
-		
-		model.addAttribute("pagina", paginaWrapper);
-		return "leilao/mostrar :: tabela";
-	}
+    Page<Leilao> pagina = leilaoService.pesquisarLeiloes(new LeilaoFilter(), pageable, usuario.getCodigo());
+    PageWrapper<Leilao> paginaWrapper = new PageWrapper<>(pagina, request);
+    
+    model.addAttribute("pagina", paginaWrapper);
+    model.addAttribute("status", StatusLeilao.values()); // 🔍 CORREÇÃO 2: Mantém as variáveis da tabela vivas
+    model.addAttribute("notificacaoSA2", new NotificacaoSweetAlert2("Lance dado com sucesso.",
+            TipoNotificaoSweetAlert2.SUCCESS, 4000));
+            
+    return "leilao/mostrar :: tabela";
+}
 	
 }
