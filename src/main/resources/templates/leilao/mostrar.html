@@ -39,8 +39,15 @@
                   <td th:text="${leilao.gado.nome}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">New York No. 1 Lake Park</td>
                   <td th:text="${leilao.gado.raca}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">New York No. 1 Lake Park</td>
                   <td th:if="${leilao.status != null and leilao.status.name() == 'ABERTO'}" class="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
-                    <a th:hx-get="@{/leilao/lance/{codigo}(codigo=${leilao.codigo})}" class="cursor-pointer text-blue-600 hover:text-blue-500 decoration-2 hover:underline focus:outline-hidden focus:underline">Dar um lance!</a>
+                    <a th:hx-get="@{/leilao/lance/{codigo}(codigo=${leilao.codigo})}"
+                      hx-target="#modal-container"
+                      hx-swap="innerHTML"
+                      class="cursor-pointer text-blue-600 hover:text-blue-500 decoration-2 hover:underline focus:outline-hidden focus:underline">
+                      Dar um lance!
+                    </a>
                   </td>
+
+                  <div id="modal-container"></div>
                 </tr>
               </tbody>
             </table>

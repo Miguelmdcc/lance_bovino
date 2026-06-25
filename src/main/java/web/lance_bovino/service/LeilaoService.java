@@ -61,7 +61,7 @@ public class LeilaoService {
     @Transactional(readOnly = true)
     public Leilao buscar(Long codigo) {
         logger.info("Buscando o leilao com código: {}", codigo);
-        return leilaoRepository.findByCodigoAndStatus(codigo, StatusLeilao.AGUARDANDO);
+        return leilaoRepository.findById(codigo).orElse(null);
     }
 
     @Transactional(readOnly = true)

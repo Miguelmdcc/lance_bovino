@@ -29,6 +29,7 @@ import web.lance_bovino.dto.LeilaoDTOInput;
 import web.lance_bovino.filter.LeilaoFilter;
 import web.lance_bovino.model.Gado;
 import web.lance_bovino.model.Leilao;
+import web.lance_bovino.model.LeilaoBidHistory;
 import web.lance_bovino.model.StatusLeilao;
 import web.lance_bovino.model.Usuario;
 import web.lance_bovino.notification.NotificacaoSweetAlert2;
@@ -36,6 +37,7 @@ import web.lance_bovino.notification.TipoNotificaoSweetAlert2;
 import web.lance_bovino.pagination.PageWrapper;
 import web.lance_bovino.repository.UsuarioRepository;
 import web.lance_bovino.service.GadoService;
+import web.lance_bovino.service.LeilaoBidHistoryService;
 import web.lance_bovino.service.LeilaoService;
 
 
@@ -48,13 +50,15 @@ public class LeilaoController {
     private UsuarioRepository usuarioRepository;
 	private GadoService gadoService;
 	private LeilaoService leilaoService;
+	private LeilaoBidHistoryService leilaoBidHistoryService;
 	
 	public LeilaoController(UsuarioRepository usuarioRepository, GadoService gadoService,
-		LeilaoService leilaoService
+		LeilaoService leilaoService, LeilaoBidHistoryService leilaoBidHistoryService
 	) {
         this.usuarioRepository = usuarioRepository;
 		this.gadoService = gadoService;
 		this.leilaoService = leilaoService;
+		this.leilaoBidHistoryService = leilaoBidHistoryService;
 	}
 
 	@GetMapping("/abrirpesquisarmeusleiloes")
@@ -224,5 +228,45 @@ public class LeilaoController {
         }
         return "redirect:/leilao/pesquisarmeusleiloes";
     }
+
+	@GetMapping("/lance/{codigo}")
+	public String abrirModalLance(@PathVariable Long codigo, Model model) {
+		Leilao leilao = leilaoService.buscar(codigo); 
+		model.addAttribute("leilao", leilao);
+		return "leilao/modal_lance :: modal"; 
+	}
+
+	@PostMapping("/lance/salvar")
+	public String salvarLanceNovo(Long leilaoCodigo, java.math.BigDecimal valorLance, 
+								@AuthenticationPrincipal UserDetails userDetails, 
+								Model model, Pageable pageable, HttpServletRequest request,
+							HttpServletResponse response) {
+		
+		Usuario usuario = usuarioRepository.findByNome(userDetails.getUsername());
+		Leilao leilao = leilaoService.buscar(leilaoCodigo);
+		if (valorLance == null || valorLance.compareTo(leilao.getInitialPrice()) < 0) {
+        model.addAttribute("leilao", leilao);
+        model.addAttribute("erroLance", "O seu lance não pode ser menor que o lance inicial de R$ " + leilao.getInitialPrice());
+        
+        response.setHeader("HX-Retarget", "#modal-container");
+        response.setHeader("HX-Reswap", "innerHTML");
+        
+        return "leilao/modal_lance :: modal"; 
+    	}
+		LeilaoBidHistory lance = new LeilaoBidHistory();
+		lance.setLeilao(leilao);
+		lance.setUsuario(usuario);
+		lance.setBidValue(valorLance);
+		lance.setTimestampDeCriacao(LocalDateTime.now());
+		leilaoBidHistoryService.salvar(lance);
+		
+		logger.info("Usuário {} deu um lance de R$ {} no leilão {}", usuario.getNome(), valorLance, leilao.getNome());
+
+		Page<Leilao> pagina = leilaoService.pesquisarUsuario(new LeilaoFilter(), pageable, usuario.getCodigo());
+		web.lance_bovino.pagination.PageWrapper<Leilao> paginaWrapper = new web.lance_bovino.pagination.PageWrapper<>(pagina, request);
+		
+		model.addAttribute("pagina", paginaWrapper);
+		return "leilao/mostrar :: tabela";
+	}
 	
 }
