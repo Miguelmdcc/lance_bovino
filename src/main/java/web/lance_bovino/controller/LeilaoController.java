@@ -232,6 +232,8 @@ public class LeilaoController {
 	@GetMapping("/lance/{codigo}")
 	public String abrirModalLance(@PathVariable Long codigo, Model model) {
 		Leilao leilao = leilaoService.buscar(codigo); 
+        LeilaoBidHistory leilaoBidHistory = leilaoBidHistoryService.buscarUltimoLance(codigo);
+        model.addAttribute("ultimoLance",leilaoBidHistory);
 		model.addAttribute("leilao", leilao);
 		return "leilao/modal_lance :: modal"; 
 	}
@@ -245,11 +247,20 @@ public class LeilaoController {
                             HttpServletResponse response) {
     
     Usuario usuario = usuarioRepository.findByNome(userDetails.getUsername());
+    LeilaoBidHistory leilaoBidHistory = leilaoBidHistoryService.buscarUltimoLance(leilaoCodigo);
     Leilao leilao = leilaoService.buscar(leilaoCodigo);
+    java.math.BigDecimal initialPrice;
+    if(leilaoBidHistory == null){
+        initialPrice = leilao.getInitialPrice();
+    }
+    else{
+        initialPrice = leilaoBidHistory.getBidValue();
+    }
     
-    if (valorLance == null || valorLance.compareTo(leilao.getInitialPrice()) < 0) {
+    if (valorLance == null || valorLance.compareTo(initialPrice) <= 0) {
         model.addAttribute("leilao", leilao);
-        model.addAttribute("erroLance", "O seu lance não pode ser menor que o lance inicial de R$ " + leilao.getInitialPrice());
+        model.addAttribute("ultimoLance", leilaoBidHistory);
+        model.addAttribute("erroLance", "O seu lance não pode ser menor que o lance inicial de R$ " + initialPrice);
         
         response.setHeader("HX-Retarget", "#modal-container");
         response.setHeader("HX-Reswap", "innerHTML");
@@ -270,7 +281,7 @@ public class LeilaoController {
     PageWrapper<Leilao> paginaWrapper = new PageWrapper<>(pagina, request);
     
     model.addAttribute("pagina", paginaWrapper);
-    model.addAttribute("status", StatusLeilao.values()); // 🔍 CORREÇÃO 2: Mantém as variáveis da tabela vivas
+    model.addAttribute("status", StatusLeilao.values());
     model.addAttribute("notificacaoSA2", new NotificacaoSweetAlert2("Lance dado com sucesso.",
             TipoNotificaoSweetAlert2.SUCCESS, 4000));
             

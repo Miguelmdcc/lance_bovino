@@ -4,10 +4,10 @@
 
     <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 99999; box-sizing: border-box;">
         
-        <div style="background-color: white; border-radius: 12px; padding: 24px; width: 100%; max-width: 400px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); font-family: Arial, sans-serif; display: flex; flex-col; box-sizing: border-box; margin: 16px;">
+        <div style="background-color: white; border-radius: 12px; padding: 24px; width: 100%; max-width: 400px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); font-family: Arial, sans-serif; display: flex; flex-direction: column; box-sizing: border-box; margin: 16px;">
             
             <div style="width: 100%;">
-                <div style="display: flex; justify-content: space-between; align-items: center; border-b: 1px solid #eee; padding-bottom: 12px; margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 12px; margin-bottom: 16px;">
                     <div>
                         <h3 style="margin: 0; font-size: 18px; font-weight: bold; color: #111827;">Dar um Lance</h3>
                         <p style="margin: 4px 0 0 0; font-size: 13px; color: #6b7280;" th:text="${'Leilão: ' + leilao?.nome}">Nome do Leilão</p>
@@ -31,21 +31,23 @@
                     
                     <input type="hidden" name="leilaoCodigo" th:value="${leilao?.codigo}" />
 
+                    <input type="hidden" name="valorLance" id="valorLanceReal" />
+
                     <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; box-sizing: border-box;">
                         <span style="font-size: 12px; color: #4b5563; font-weight: bold; text-transform: uppercase;">Lance Mínimo:</span>
-                        <span style="font-size: 18px; font-weight: bold; color: #2563eb;" th:text="${'R$ ' + leilao?.initialPrice}">R$ 0,00</span>
+                        <span style="font-size: 18px; font-weight: bold; color: #2563eb;" 
+                              th:text="${ultimoLance != null ? 'R$ ' + #numbers.formatDecimal(ultimoLance.bidValue, 1, 'POINT', 2, 'COMMA') : 'R$ ' + #numbers.formatDecimal(leilao?.initialPrice, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</span>
                     </div>
 
                     <div style="margin-bottom: 20px;">
-                        <label for="valorLance" style="display: block; font-size: 14px; font-weight: bold; color: #374151; margin-bottom: 6px;">Digite o seu lance</label>
+                        <label for="valorLanceFormatado" style="display: block; font-size: 14px; font-weight: bold; color: #374151; margin-bottom: 6px;">Digite o seu lance</label>
                         <div style="position: relative; display: flex; align-items: center;">
                             <span style="position: absolute; left: 12px; color: #9ca3af; font-weight: bold; font-size: 14px;">R$</span>
-                            <input type="number" 
-                                   step="0.01" 
-                                   name="valorLance" 
-                                   id="valorLance"
+                            
+                            <input type="text" 
+                                   id="valorLanceFormatado"
                                    required 
-                                   th:min="${leilao?.initialPrice}"
+                                   oninput="mascararMoedaPreencherOculto(this)"
                                    style="width: 100%; padding: 10px 12px 10px 36px; background-color: #f9fafb; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; color: #111827; font-weight: bold; box-sizing: border-box;" 
                                    placeholder="0,00"/>
                         </div>
@@ -67,6 +69,30 @@
 
         </div>
     </div>
+
+    <script>
+        function mascararMoedaPreencherOculto(input) {
+            let valor = input.value.replace(/\D/g, "");
+            
+            if (valor === "") {
+                input.value = "";
+                document.getElementById("valorLanceReal").value = "";
+                return;
+            }
+            
+            let valorNumericoPuro = (parseFloat(valor) / 100).toFixed(2); // Ex: "2000.02"
+            
+            // 🔍 SOLUÇÃO: Substitui o ponto por vírgula antes de enviar ao Controller (Ex: "2000,02")
+            // Sem pontos de milhar, apenas a vírgula para demarcar os centavos.
+            document.getElementById("valorLanceReal").value = valorNumericoPuro.replace(".", ",");
+            
+            // Formatação visual para o usuário na tela (Ex: "2.000,02")
+            let partes = valorNumericoPuro.split(".");
+            partes[0] = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            
+            input.value = partes.join(",");
+        }
+    </script>
 
 </body>
 </html>

@@ -39,4 +39,10 @@ public class LeilaoBidHistoryService {
         leilaoBIdHRepository.deleteById(codigo); 
     }
 
+    @Transactional(readOnly = true)
+    public LeilaoBidHistory buscarUltimoLance(Long codigo) { 
+        logger.info("Removendo leilaoBIdH com código: {}", codigo); 
+        return leilaoBIdHRepository.buscarUltimoLance(codigo); 
+    }
+
 } 
