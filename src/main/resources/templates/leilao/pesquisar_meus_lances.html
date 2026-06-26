@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.thymeleaf.org"
+  layout:decorate="~{layout/layoutpadrao}">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
+  <title>Página Principal</title>
+</head>
+
+<body>
+  <!-- conteudo principal -->
+<main layout:fragment="conteudo" th:fragment="formulario" id="main" class="flex flex-col align-middle w-full m-10">
+
+    <form th:hx-get="@{/leilao/pesquisarmeuslances}" class="w-1/2 mt-8 ms-16 space-y-4">
+          
+          <div th:replace="~{components/forms :: inputTexto(
+            textoLabel='Nome', 
+            nomeAtributo='nome')}"></div>
+
+          <div th:replace="~{components/forms :: inputDecimal(
+            textoLabel='Lance(R$)', 
+            nomeAtributo='bidValue')}"></div>
+
+          <div th:replace="~{components/forms :: inputBuscavel(
+                textoLabel='Gado',
+                nomeAtributo='gado',
+                valorAtributo=${gado != null ? gado.codigo : -1},
+                textoAtributo=${gado != null ? gado.nome : 'Selecione uma opção'},
+                placeholderBusca='Buscar gado...',
+                urlBusca='/leilao/pesquisargadolances')}"></div>
+            
+          <div th:replace="~{components/forms :: selectNormal(
+            textoLabel='Venceu?', 
+            nomeAtributo='vencedor',
+            listaOpcoes=${venceuounao}, 
+            propLabel=null, 
+            propValue=null, 
+            placeholder='Selecione um status do lance')}"></div>
+
+          <div th:replace="~{components/forms :: selectNormal(
+            textoLabel='Status do leilão', 
+            nomeAtributo='status',
+            listaOpcoes=${statuses}, 
+            propLabel='descricao', 
+            propValue=null, 
+            placeholder='Selecione um status')}"></div>
+            
+      <button type="submit"
+        class="mt-7 py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-100 text-blue-800 hover:bg-blue-200 focus:outline-none focus:bg-blue-200 disabled:opacity-50 disabled:pointer-events-none">
+        Pesquisar
+      </button>
+    </form>
+
+  </main>
+  <!-- !conteudo principal -->
+
+</body>
+
+</html>

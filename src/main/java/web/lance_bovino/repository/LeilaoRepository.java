@@ -1,5 +1,7 @@
 package web.lance_bovino.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,7 +15,7 @@ public interface LeilaoRepository extends JpaRepository<Leilao, Long>, LeilaoQue
 
     Leilao findByCodigoAndStatus(Long codigo, StatusLeilao statusLeilao);
 
-    void atualizarStatusLeiloes();
+    List<Leilao> atualizarStatusLeiloes();
 
     Page<Leilao> pesquisarLeiloes(LeilaoFilter filtro, Pageable pageable, Long usuarioCodigo);
 

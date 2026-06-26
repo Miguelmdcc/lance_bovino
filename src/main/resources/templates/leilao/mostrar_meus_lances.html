@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.thymeleaf.org" layout:decorate="~{layout/layoutpadrao}" >
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
+  <title>Meus Lances</title>
+</head>
+
+<body>
+  <main layout:fragment="conteudo" th:fragment="tabela" id="main" class="flex flex-col align-middle w-full m-10">
+    
+    <h1 th:if="${pagina.vazia}" class="text-2xl md:text-4xl text-center">Não foram encontrados lances com essa pesquisa</h1>
+
+    <div th:if="${not pagina.vazia}" class="flex flex-col mr-10 ml-10 mt-5">
+      <div class="overflow-x-auto">
+        <div class="min-w-full inline-block align-middle">
+          <div class="border rounded-xl overflow-hidden shadow">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead>
+                <tr>
+                  <th:block th:replace="~{components/paginacao :: coluna(${pagina}, 'leilao.nome', 'Nome do Leilão', '')}"></th:block>
+                  <th:block th:replace="~{components/paginacao :: coluna(${pagina}, 'leilao.gado.nome', 'Gado', '')}"></th:block>
+                  <th:block th:replace="~{components/paginacao :: coluna(${pagina}, 'leilao.status', 'Status do Leilão', '')}"></th:block>
+                  <th:block th:replace="~{components/paginacao :: coluna(${pagina}, 'bidValue', 'Meu Lance', '')}"></th:block>
+                  <th:block th:replace="~{components/paginacao :: coluna(${pagina}, 'timestampDeCriacao', 'Data do lance', '')}"></th:block>
+                  <th:block th:replace="~{components/paginacao :: coluna(${pagina}, 'leilao.vencedor', 'Resultado', '')}"></th:block>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="lance : ${pagina.conteudo}" class="odd:bg-white even:bg-gray-100 hover:bg-gray-200">
+                  
+                  <td th:text="${lance.leilao?.nome}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">Nome</td>
+                  <td th:text="${lance.leilao?.gado?.nome}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">Gado</td>
+                  
+                  <td th:if="${lance.leilao?.status?.name() == 'ENCERRADO'}" th:text="${lance.leilao.status.name()}" class="px-6 py-4 whitespace-nowrap text-sm" style="color: red;">New York No. 1 Lake Park</td>
+                  <td th:if="${lance.leilao?.status?.name() == 'ABERTO'}" th:text="${lance.leilao.status.name()}" class="px-6 py-4 whitespace-nowrap text-sm" style="color: green;">New York No. 1 Lake Park</td>
+                  
+                  <td th:text="${'R$ ' + #numbers.formatDecimal(lance.bidValue, 1, 'POINT', 2, 'COMMA')}" class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-800">R$ 0,00</td>
+                  
+                  <td th:text="${#temporals.format(lance.timestampDeCriacao, 'dd/MM/yyyy HH:mm')}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">00/00/0000 00:00</td>
+                  
+                  <td th:if="${lance.leilao?.vencedor != null and lance.leilao.vencedor.codigo == lance.usuario.codigo}" th:text="'Venceu'" class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-600" style="color: green;">Venceu</td>
+                  
+                  <td th:if="${lance.leilao?.status?.name() == 'ENCERRADO' and (lance.leilao.vencedor == null or lance.leilao.vencedor.codigo != lance.usuario.codigo)}" th:text="'Não venceu'" class="px-6 py-4 whitespace-nowrap text-sm font-bold text-red-500" style="color: red;">Não venceu</td>
+                  
+                  <td th:if="${lance.leilao?.status?.name() == 'ABERTO'}" th:text="'Aberto (Aguardando)'" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Aberto</td>
+                  
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                     -
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div th:replace="~{components/paginacao :: paginacao(${pagina})}"></div> 
+        </div>
+      </div>
+    </div>
+    
+  </main>
+</body>
+</html>

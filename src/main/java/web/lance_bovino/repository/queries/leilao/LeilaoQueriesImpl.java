@@ -141,14 +141,29 @@ public class LeilaoQueriesImpl implements LeilaoQueries {
 		}
 	}
 
-	public void atualizarStatusLeiloes() {
-		String leilaoQuery = "UPDATE Leilao l SET l.status = :novoStatus WHERE l.finalTimestamp < :agora AND l.status = :statusAberto";
-		
-		em.createQuery(leilaoQuery)
-		.setParameter("novoStatus", StatusLeilao.ENCERRADO)
-		.setParameter("agora", LocalDateTime.now())
-		.setParameter("statusAberto", StatusLeilao.ABERTO)
-		.executeUpdate();
+	public List<Leilao> atualizarStatusLeiloes() {
+		LocalDateTime agora = LocalDateTime.now();
+		String selectQuery = "select l from Leilao l where l.finalTimestamp < :agora and l.status = :statusAberto";
+		List<Leilao> leiloes = em.createQuery(selectQuery, Leilao.class)
+				.setParameter("agora", agora)
+				.setParameter("statusAberto", StatusLeilao.ABERTO)
+				.getResultList();
+
+		if (!leiloes.isEmpty()) {
+			String updateQuery = "UPDATE Leilao l SET l.status = :novoStatus WHERE l.finalTimestamp < :agora AND l.status = :statusAberto";
+
+			em.createQuery(updateQuery)
+				.setParameter("novoStatus", StatusLeilao.ENCERRADO)
+				.setParameter("agora", agora)
+				.setParameter("statusAberto", StatusLeilao.ABERTO)
+				.executeUpdate();
+
+			for (Leilao leilao : leiloes) {
+				em.refresh(leilao);
+			}
+		}
+
+		return leiloes;
 	}
 
 	public Page<Leilao> pesquisarLeiloes(LeilaoFilter filtro, Pageable pageable, Long usuarioCodigo) {

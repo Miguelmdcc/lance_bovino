@@ -1,7 +1,10 @@
 package web.lance_bovino.controller;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,9 +29,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import web.lance_bovino.dto.LeilaoDTOInput;
+import web.lance_bovino.filter.LeilaoBidHistoryFilter;
 import web.lance_bovino.filter.LeilaoFilter;
 import web.lance_bovino.model.Gado;
 import web.lance_bovino.model.Leilao;
+import web.lance_bovino.model.LeilaoBidHistory;
 import web.lance_bovino.model.StatusLeilao;
 import web.lance_bovino.model.Usuario;
 import web.lance_bovino.notification.NotificacaoSweetAlert2;
@@ -36,6 +41,7 @@ import web.lance_bovino.notification.TipoNotificaoSweetAlert2;
 import web.lance_bovino.pagination.PageWrapper;
 import web.lance_bovino.repository.UsuarioRepository;
 import web.lance_bovino.service.GadoService;
+import web.lance_bovino.service.LeilaoBidHistoryService;
 import web.lance_bovino.service.LeilaoService;
 
 
@@ -48,13 +54,15 @@ public class LeilaoController {
     private UsuarioRepository usuarioRepository;
 	private GadoService gadoService;
 	private LeilaoService leilaoService;
+	private LeilaoBidHistoryService leilaoBidHistoryService;
 	
 	public LeilaoController(UsuarioRepository usuarioRepository, GadoService gadoService,
-		LeilaoService leilaoService
+		LeilaoService leilaoService, LeilaoBidHistoryService leilaoBidHistoryService
 	) {
         this.usuarioRepository = usuarioRepository;
 		this.gadoService = gadoService;
 		this.leilaoService = leilaoService;
+		this.leilaoBidHistoryService = leilaoBidHistoryService;
 	}
 
 	@GetMapping("/abrirpesquisarmeusleiloes")
@@ -73,6 +81,8 @@ public class LeilaoController {
             @PageableDefault(size = 9) @SortDefault(sort = "codigo",
                     direction = Sort.Direction.ASC) Pageable pageable,
             HttpServletRequest request,@AuthenticationPrincipal UserDetails userDetails) {
+        List<Leilao> leiloes_encerrados = leilaoService.atualizarStatusLeiloes();
+        leilaoBidHistoryService.atualizarVencedores(leiloes_encerrados);
 		Long usuarioCodigo = usuarioRepository.findByNome(userDetails.getUsername()).getCodigo();
         Page<Leilao> pagina = leilaoService.pesquisarUsuario(filtro, pageable, usuarioCodigo);
         logger.info("Leiloes do usuario {} pesquisados: {}", userDetails.getUsername(), pagina.getContent());
@@ -94,6 +104,8 @@ public class LeilaoController {
             @PageableDefault(size = 9) @SortDefault(sort = "codigo",
                     direction = Sort.Direction.ASC) Pageable pageable,
             HttpServletRequest request,@AuthenticationPrincipal UserDetails userDetails) {
+        List<Leilao> leiloes_encerrados = leilaoService.atualizarStatusLeiloes();
+        leilaoBidHistoryService.atualizarVencedores(leiloes_encerrados);
 		Long usuarioCodigo = usuarioRepository.findByNome(userDetails.getUsername()).getCodigo();
         Page<Leilao> pagina = leilaoService.pesquisarLeiloes(filtro, pageable, usuarioCodigo);
         logger.info("Leiloes do usuario {} pesquisados: {}", userDetails.getUsername(), pagina.getContent());
@@ -101,6 +113,38 @@ public class LeilaoController {
         model.addAttribute("pagina", paginaWrapper);
 		model.addAttribute("status",StatusLeilao.values());
         return "leilao/mostrar :: tabela";
+    }
+
+    @GetMapping("/abrirpesquisarmeuslances")
+    public String abrirPesquisaMeusLances(Model model, @AuthenticationPrincipal UserDetails userDetails) {
+        List<String> venceuounaoList = new ArrayList<>();
+        venceuounaoList.add("Venceu");
+        venceuounaoList.add("Não venceu");
+        model.addAttribute("venceuounao",venceuounaoList);
+        List<StatusLeilao> statuses = new ArrayList<>();
+        for(StatusLeilao status: StatusLeilao.values()){
+            if(status != StatusLeilao.AGUARDANDO){
+                statuses.add(status);
+            }
+        }
+		model.addAttribute("statuses",statuses);
+        return "leilao/pesquisar_meus_lances :: formulario";
+    }
+
+    @GetMapping("/pesquisarmeuslances")
+    public String pesquisarMeusLances(LeilaoBidHistoryFilter filtro, Model model,
+            @PageableDefault(size = 9) @SortDefault(sort = "codigo",
+                    direction = Sort.Direction.ASC) Pageable pageable,
+            HttpServletRequest request,@AuthenticationPrincipal UserDetails userDetails) {
+        List<Leilao> leiloes_encerrados = leilaoService.atualizarStatusLeiloes();
+        leilaoBidHistoryService.atualizarVencedores(leiloes_encerrados);
+		Long usuarioCodigo = usuarioRepository.findByNome(userDetails.getUsername()).getCodigo();
+        Page<LeilaoBidHistory> pagina = leilaoBidHistoryService.pesquisarUsuario(filtro, pageable, usuarioCodigo);
+        logger.info("Lances do usuario {} pesquisados: {}", userDetails.getUsername(), pagina.getContent());
+        PageWrapper<LeilaoBidHistory> paginaWrapper = new PageWrapper<>(pagina, request);
+        model.addAttribute("pagina", paginaWrapper);
+		model.addAttribute("status",StatusLeilao.values());
+        return "leilao/mostrar_meus_lances :: tabela";
     }
 
 	@GetMapping("/cadastrar")
@@ -121,6 +165,22 @@ public class LeilaoController {
     public String pesquisarGadoCadastrar(String gadoBusca, Model model,@AuthenticationPrincipal UserDetails userDetails) {
 		Long codigo_usuario = usuarioRepository.findByNome(userDetails.getUsername()).getCodigo();
         List<Gado> gados = gadoService.pesquisarGeral(gadoBusca, codigo_usuario);
+        logger.debug("Gados buscados: {}", gados);
+        model.addAttribute("gados", gados);
+        return "gado/listar :: lista";
+    }
+
+    @GetMapping("/pesquisargadolances")
+    public String pesquisarGadoLances(Model model,@AuthenticationPrincipal UserDetails userDetails) {
+		Long codigo_usuario = usuarioRepository.findByNome(userDetails.getUsername()).getCodigo();
+        List<LeilaoBidHistory> leilaoBidHistoryList = leilaoBidHistoryService.buscarTodosLancesUsuario(codigo_usuario);
+        Set<Gado> gadosSet = new HashSet<>();
+        for(LeilaoBidHistory lance: leilaoBidHistoryList){
+            if(lance.getLeilao() != null && lance.getLeilao().getGado() != null){
+                gadosSet.add(lance.getLeilao().getGado());
+            }
+        }
+        List<Gado> gados = new ArrayList<>(gadosSet);
         logger.debug("Gados buscados: {}", gados);
         model.addAttribute("gados", gados);
         return "gado/listar :: lista";
@@ -224,5 +284,64 @@ public class LeilaoController {
         }
         return "redirect:/leilao/pesquisarmeusleiloes";
     }
+
+	@GetMapping("/lance/{codigo}")
+	public String abrirModalLance(@PathVariable Long codigo, Model model) {
+		Leilao leilao = leilaoService.buscar(codigo); 
+        LeilaoBidHistory leilaoBidHistory = leilaoBidHistoryService.buscarUltimoLance(codigo);
+        model.addAttribute("ultimoLance",leilaoBidHistory);
+		model.addAttribute("leilao", leilao);
+		return "leilao/modal_lance :: modal"; 
+	}
+
+	@PostMapping("/lance/salvar")
+	public String salvarLanceNovo(Long leilaoCodigo, java.math.BigDecimal valorLance, 
+                            @AuthenticationPrincipal UserDetails userDetails, 
+                            Model model, 
+                            @PageableDefault(size = 9) @SortDefault(sort = "codigo", direction = Sort.Direction.ASC) Pageable pageable, // 🔍 CORREÇÃO 1: Mantém o padrão de 9 itens
+                            HttpServletRequest request,
+                            HttpServletResponse response) {
+    
+    Usuario usuario = usuarioRepository.findByNome(userDetails.getUsername());
+    LeilaoBidHistory leilaoBidHistory = leilaoBidHistoryService.buscarUltimoLance(leilaoCodigo);
+    Leilao leilao = leilaoService.buscar(leilaoCodigo);
+    java.math.BigDecimal initialPrice;
+    if(leilaoBidHistory == null){
+        initialPrice = leilao.getInitialPrice();
+    }
+    else{
+        initialPrice = leilaoBidHistory.getBidValue();
+    }
+    
+    if (valorLance == null || valorLance.compareTo(initialPrice) <= 0) {
+        model.addAttribute("leilao", leilao);
+        model.addAttribute("ultimoLance", leilaoBidHistory);
+        model.addAttribute("erroLance", "O seu lance não pode ser menor que o lance inicial de R$ " + initialPrice);
+        
+        response.setHeader("HX-Retarget", "#modal-container");
+        response.setHeader("HX-Reswap", "innerHTML");
+        
+        return "leilao/modal_lance :: modal"; 
+    }
+    
+    LeilaoBidHistory lance = new LeilaoBidHistory();
+    lance.setLeilao(leilao);
+    lance.setUsuario(usuario);
+    lance.setBidValue(valorLance);
+    lance.setTimestampDeCriacao(LocalDateTime.now());
+    leilaoBidHistoryService.salvar(lance);
+    
+    logger.info("Usuário {} deu um lance de R$ {} no leilão {}", usuario.getNome(), valorLance, leilao.getNome());
+
+    Page<Leilao> pagina = leilaoService.pesquisarLeiloes(new LeilaoFilter(), pageable, usuario.getCodigo());
+    PageWrapper<Leilao> paginaWrapper = new PageWrapper<>(pagina, request);
+    
+    model.addAttribute("pagina", paginaWrapper);
+    model.addAttribute("status", StatusLeilao.values());
+    model.addAttribute("notificacaoSA2", new NotificacaoSweetAlert2("Lance dado com sucesso.",
+            TipoNotificaoSweetAlert2.SUCCESS, 4000));
+            
+    return "leilao/mostrar :: tabela";
+}
 	
 }

@@ -36,6 +36,7 @@ public class LeilaoDTOInput {
     @NotNull(message = "O gado é obrigatório")
     private Gado gado;
     private StatusLeilao status;
+    private Usuario vencedor;
     
     private void atualizarLocalDateTime() {
         if (dataFinal != null && !dataFinal.isBlank() && horaFinal != null && !horaFinal.isBlank()) {
@@ -122,6 +123,14 @@ public class LeilaoDTOInput {
 
     public void setStatus(StatusLeilao status) {
         this.status = status;
+    }
+
+    public Usuario getVencedor() {
+        return vencedor;
+    }
+
+    public void setVencedor(Usuario vencedor) {
+        this.vencedor = vencedor;
     }
 
     public Leilao toLeilao(){

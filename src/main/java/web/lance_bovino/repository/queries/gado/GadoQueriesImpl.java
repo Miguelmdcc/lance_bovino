@@ -73,7 +73,7 @@ public class GadoQueriesImpl implements GadoQueries {
 		} else {
 			condicoes.append(" and g.status = 'ATIVO' and g.usuario.codigo = "+codigo_usuario);
 		}
-		condicoes.append(" and g.codigo NOT IN (select l.gado.codigo from Leilao l where l.status != 'ENCERRADO')");
+		condicoes.append(" and g.codigo NOT IN (select l.gado.codigo from Leilao l where l.status != 'ENCERRADO' AND ativo=true)");
 		queryGados.append(condicoes);
 		TypedQuery<Gado> typedQuery = em.createQuery(queryGados.toString(), Gado.class);
 		PaginacaoUtil.preencherParametros(parametros, typedQuery);
