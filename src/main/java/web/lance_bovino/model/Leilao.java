@@ -51,6 +51,9 @@ public class Leilao implements Serializable {
     private StatusLeilao status = StatusLeilao.AGUARDANDO;
 
     private boolean ativo;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vencedor", referencedColumnName = "codigo")
+    private Usuario vencedor;
 
     public Long getCodigo() {
         return codigo;
@@ -140,17 +143,25 @@ public class Leilao implements Serializable {
         return ativo;
     }
 
-
-
     public void setAtivo(boolean ativo) {
         this.ativo = ativo;
     }
+
+    public Usuario getVencedor() {
+        return vencedor;
+    }
+
+    public void setVencedor(Usuario vencedor) {
+        this.vencedor = vencedor;
+    }
+
 
     @Override
     public String toString() {
         return "Leilao [codigo=" + codigo + ", nome=" + nome + ", initialPrice=" + initialPrice + ", finalTimestamp="
                 + finalTimestamp + ", usuario=" + usuario + ", gado=" + gado + ", status=" + status + ", ativo=" + ativo
-                + "]";
+                + ", vencedor=" + vencedor + "]";
     }
+
 
 }

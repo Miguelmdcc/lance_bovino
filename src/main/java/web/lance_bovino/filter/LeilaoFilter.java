@@ -16,7 +16,7 @@ public class LeilaoFilter {
     private Usuario usuario;
     private Gado gado;
     private StatusLeilao status;
-    
+    private Usuario vencedor;
     public Long getCodigo() {
         return codigo;
     }
@@ -59,12 +59,17 @@ public class LeilaoFilter {
     public void setStatus(StatusLeilao status) {
         this.status = status;
     }
-
+    public Usuario getVencedor() {
+        return vencedor;
+    }
+    public void setVencedor(Usuario vencedor) {
+        this.vencedor = vencedor;
+    }
     @Override
     public String toString() {
         return "LeilaoFilter [codigo=" + codigo + ", nome=" + nome + ", initialPrice=" + initialPrice
                 + ", finalTimestamp=" + finalTimestamp + ", usuario=" + usuario + ", gado=" + gado + ", status="
-                + status + "]";
+                + status + ", vencedor=" + vencedor + "]";
     }
     
 }

@@ -8,7 +8,10 @@ CREATE TABLE public.leilao
     codigo_gado bigint NOT NULL,
     status text DEFAULT 'AGUARDANDO',
     ativo bool DEFAULT true,
+    vencedor bigint,
     PRIMARY KEY (codigo),
     CONSTRAINT fk_leilao_usuario FOREIGN KEY (codigo_usuario) REFERENCES public.usuario(codigo),
-    CONSTRAINT fk_leilao_gado FOREIGN KEY (codigo_gado) REFERENCES public.gado(codigo)
+    CONSTRAINT fk_leilao_gado FOREIGN KEY (codigo_gado) REFERENCES public.gado(codigo),
+    CONSTRAINT fk_leilao_usuario_vencedor FOREIGN KEY (codigo_usuario) REFERENCES public.usuario(codigo)
+
 );
