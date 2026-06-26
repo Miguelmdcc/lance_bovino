@@ -7,13 +7,16 @@ import java.util.Map;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import web.lance_bovino.filter.LeilaoBidHistoryFilter;
+import web.lance_bovino.model.Leilao;
 import web.lance_bovino.model.LeilaoBidHistory;
+import web.lance_bovino.model.Usuario;
 import web.lance_bovino.pagination.PaginacaoUtil;
 
 public class LeilaoBidHistoryQueriesImpl implements LeilaoBidHistoryQueries {
@@ -159,4 +162,27 @@ public class LeilaoBidHistoryQueriesImpl implements LeilaoBidHistoryQueries {
 		return lances.isEmpty() ? null : lances.get(0);
 	}
 	
+	@Override
+	@Transactional
+	public void atualizarVencedores(List<Leilao> leiloesEncerrados){
+		for(Leilao leilao: leiloesEncerrados){
+			Long codigo = leilao.getCodigo();
+			
+			String leilaoBHQuery = "SELECT lbh FROM LeilaoBidHistory lbh " +
+					"WHERE lbh.leilao.codigo = :codigoLeilao " +
+					"ORDER BY lbh.bidValue DESC";
+					
+			List<LeilaoBidHistory> lances = em.createQuery(leilaoBHQuery, LeilaoBidHistory.class)
+				.setParameter("codigoLeilao", codigo)
+				.setMaxResults(1)
+				.getResultList();
+				
+			if(!lances.isEmpty()){
+				Usuario usuario = lances.get(0).getUsuario();
+				leilao.setVencedor(usuario);
+				
+				em.merge(leilao);
+			}
+		}
+	}
 }

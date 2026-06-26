@@ -87,6 +87,8 @@ public class LeilaoController {
         PageWrapper<Leilao> paginaWrapper = new PageWrapper<>(pagina, request);
         model.addAttribute("pagina", paginaWrapper);
 		model.addAttribute("status",StatusLeilao.values());
+        List<Leilao> leiloes_encerrados = leilaoService.atualizarStatusLeiloes();
+        leilaoBidHistoryService.atualizarVencedores(leiloes_encerrados);
         return "leilao/mostrar_meus_leiloes :: tabela";
     }
 
@@ -108,6 +110,8 @@ public class LeilaoController {
         PageWrapper<Leilao> paginaWrapper = new PageWrapper<>(pagina, request);
         model.addAttribute("pagina", paginaWrapper);
 		model.addAttribute("status",StatusLeilao.values());
+        List<Leilao> leiloes_encerrados = leilaoService.atualizarStatusLeiloes();
+        leilaoBidHistoryService.atualizarVencedores(leiloes_encerrados);
         return "leilao/mostrar :: tabela";
     }
 
@@ -138,6 +142,8 @@ public class LeilaoController {
         PageWrapper<LeilaoBidHistory> paginaWrapper = new PageWrapper<>(pagina, request);
         model.addAttribute("pagina", paginaWrapper);
 		model.addAttribute("status",StatusLeilao.values());
+        List<Leilao> leiloes_encerrados = leilaoService.atualizarStatusLeiloes();
+        leilaoBidHistoryService.atualizarVencedores(leiloes_encerrados);
         return "leilao/mostrar_meus_lances :: tabela";
     }
 

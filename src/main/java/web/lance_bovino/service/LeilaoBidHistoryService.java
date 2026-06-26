@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import web.lance_bovino.filter.LeilaoBidHistoryFilter;
+import web.lance_bovino.model.Leilao;
 import web.lance_bovino.model.LeilaoBidHistory;
 import web.lance_bovino.repository.LeilaoBidHistoryRepository;
 
@@ -58,6 +59,12 @@ public class LeilaoBidHistoryService {
     public Page<LeilaoBidHistory> pesquisarUsuario(LeilaoBidHistoryFilter filtro, Pageable pageable, Long usuarioCodigo) {
         logger.info("Pesquisando lances com o filtro {}", filtro);
         return leilaoBIdHRepository.pesquisar(filtro, pageable, usuarioCodigo);
+    }
+
+    @Transactional
+    public void atualizarVencedores(List<Leilao> leiloesEncerrados){
+        logger.info("Atualizando vencedores dos leiloes");
+        leilaoBIdHRepository.atualizarVencedores(leiloesEncerrados);
     }
 
 } 

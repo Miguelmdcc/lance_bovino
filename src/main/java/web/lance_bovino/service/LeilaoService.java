@@ -11,8 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import web.lance_bovino.filter.LeilaoFilter;
 import web.lance_bovino.model.Leilao;
-import web.lance_bovino.model.Status;
-import web.lance_bovino.model.StatusLeilao;
 import web.lance_bovino.repository.LeilaoRepository;
 
 @Service 
@@ -29,21 +27,20 @@ public class LeilaoService {
     @Transactional
     public Page<Leilao> pesquisarUsuario(LeilaoFilter filtro, Pageable pageable, Long usuarioCodigo) {
         logger.info("Pesquisando leilões com o filtro {}", filtro);
-        leilaoRepository.atualizarStatusLeiloes();
         return leilaoRepository.pesquisar(filtro, pageable, usuarioCodigo);
     }
 
     @Transactional
     public Page<Leilao> pesquisarLeiloes(LeilaoFilter filtro, Pageable pageable, Long usuarioCodigo) {
         logger.info("Pesquisando leilões com o filtro {}", filtro);
-        leilaoRepository.atualizarStatusLeiloes();
         return leilaoRepository.pesquisarLeiloes(filtro, pageable, usuarioCodigo);
     }
 
     @Transactional
-    public void atualizarStatusLeiloes(){
+    public List<Leilao> atualizarStatusLeiloes(){
         logger.info("Atualizando status dos leiloes");
-        leilaoRepository.atualizarStatusLeiloes();
+        List<Leilao> leiloes_encerrados = leilaoRepository.atualizarStatusLeiloes();
+        return leiloes_encerrados;
     }
 
     @Transactional 
