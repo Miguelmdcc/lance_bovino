@@ -1,5 +1,6 @@
 package web.lance_bovino.repository.queries.leilaobidhistory;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import web.lance_bovino.filter.LeilaoBidHistoryFilter;
+import web.lance_bovino.model.Gado;
+import web.lance_bovino.model.GadoHistory;
 import web.lance_bovino.model.Leilao;
 import web.lance_bovino.model.LeilaoBidHistory;
 import web.lance_bovino.model.Usuario;
@@ -163,9 +166,9 @@ public class LeilaoBidHistoryQueriesImpl implements LeilaoBidHistoryQueries {
 	}
 	
 	@Override
-	@Transactional
+	@Transactional 
 	public void atualizarVencedores(List<Leilao> leiloesEncerrados){
-		for(Leilao leilao: leiloesEncerrados){
+		for (Leilao leilao : leiloesEncerrados) {
 			Long codigo = leilao.getCodigo();
 			
 			String leilaoBHQuery = "SELECT lbh FROM LeilaoBidHistory lbh " +
@@ -177,11 +180,25 @@ public class LeilaoBidHistoryQueriesImpl implements LeilaoBidHistoryQueries {
 				.setMaxResults(1)
 				.getResultList();
 				
-			if(!lances.isEmpty()){
-				Usuario usuario = lances.get(0).getUsuario();
-				leilao.setVencedor(usuario);
+			if (!lances.isEmpty()) {
+				Usuario usuarioVencedor = lances.get(0).getUsuario();
 				
+				leilao.setVencedor(usuarioVencedor);
 				em.merge(leilao);
+				
+				Gado gado = leilao.getGado();
+				if (gado != null) {
+					gado.setUsuario(usuarioVencedor); 
+					em.merge(gado);
+					
+					GadoHistory historico = new GadoHistory();
+					historico.setGado(gado);
+					historico.setUsuario(usuarioVencedor); 
+					historico.setTimestampDeCriacao(LocalDateTime.now());
+					historico.setAtivo(true); 
+					
+					em.persist(historico); 
+				}
 			}
 		}
 	}

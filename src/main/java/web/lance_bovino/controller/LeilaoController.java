@@ -81,14 +81,14 @@ public class LeilaoController {
             @PageableDefault(size = 9) @SortDefault(sort = "codigo",
                     direction = Sort.Direction.ASC) Pageable pageable,
             HttpServletRequest request,@AuthenticationPrincipal UserDetails userDetails) {
+        List<Leilao> leiloes_encerrados = leilaoService.atualizarStatusLeiloes();
+        leilaoBidHistoryService.atualizarVencedores(leiloes_encerrados);
 		Long usuarioCodigo = usuarioRepository.findByNome(userDetails.getUsername()).getCodigo();
         Page<Leilao> pagina = leilaoService.pesquisarUsuario(filtro, pageable, usuarioCodigo);
         logger.info("Leiloes do usuario {} pesquisados: {}", userDetails.getUsername(), pagina.getContent());
         PageWrapper<Leilao> paginaWrapper = new PageWrapper<>(pagina, request);
         model.addAttribute("pagina", paginaWrapper);
 		model.addAttribute("status",StatusLeilao.values());
-        List<Leilao> leiloes_encerrados = leilaoService.atualizarStatusLeiloes();
-        leilaoBidHistoryService.atualizarVencedores(leiloes_encerrados);
         return "leilao/mostrar_meus_leiloes :: tabela";
     }
 
@@ -104,14 +104,14 @@ public class LeilaoController {
             @PageableDefault(size = 9) @SortDefault(sort = "codigo",
                     direction = Sort.Direction.ASC) Pageable pageable,
             HttpServletRequest request,@AuthenticationPrincipal UserDetails userDetails) {
+        List<Leilao> leiloes_encerrados = leilaoService.atualizarStatusLeiloes();
+        leilaoBidHistoryService.atualizarVencedores(leiloes_encerrados);
 		Long usuarioCodigo = usuarioRepository.findByNome(userDetails.getUsername()).getCodigo();
         Page<Leilao> pagina = leilaoService.pesquisarLeiloes(filtro, pageable, usuarioCodigo);
         logger.info("Leiloes do usuario {} pesquisados: {}", userDetails.getUsername(), pagina.getContent());
         PageWrapper<Leilao> paginaWrapper = new PageWrapper<>(pagina, request);
         model.addAttribute("pagina", paginaWrapper);
 		model.addAttribute("status",StatusLeilao.values());
-        List<Leilao> leiloes_encerrados = leilaoService.atualizarStatusLeiloes();
-        leilaoBidHistoryService.atualizarVencedores(leiloes_encerrados);
         return "leilao/mostrar :: tabela";
     }
 
@@ -136,14 +136,14 @@ public class LeilaoController {
             @PageableDefault(size = 9) @SortDefault(sort = "codigo",
                     direction = Sort.Direction.ASC) Pageable pageable,
             HttpServletRequest request,@AuthenticationPrincipal UserDetails userDetails) {
+        List<Leilao> leiloes_encerrados = leilaoService.atualizarStatusLeiloes();
+        leilaoBidHistoryService.atualizarVencedores(leiloes_encerrados);
 		Long usuarioCodigo = usuarioRepository.findByNome(userDetails.getUsername()).getCodigo();
         Page<LeilaoBidHistory> pagina = leilaoBidHistoryService.pesquisarUsuario(filtro, pageable, usuarioCodigo);
         logger.info("Lances do usuario {} pesquisados: {}", userDetails.getUsername(), pagina.getContent());
         PageWrapper<LeilaoBidHistory> paginaWrapper = new PageWrapper<>(pagina, request);
         model.addAttribute("pagina", paginaWrapper);
 		model.addAttribute("status",StatusLeilao.values());
-        List<Leilao> leiloes_encerrados = leilaoService.atualizarStatusLeiloes();
-        leilaoBidHistoryService.atualizarVencedores(leiloes_encerrados);
         return "leilao/mostrar_meus_lances :: tabela";
     }
 
