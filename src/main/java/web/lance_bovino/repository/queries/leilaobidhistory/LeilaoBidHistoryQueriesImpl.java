@@ -1,6 +1,5 @@
 package web.lance_bovino.repository.queries.leilaobidhistory;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,10 +12,8 @@ import org.springframework.util.StringUtils;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
-import web.lance_bovino.filter.LeilaoFilter;
-import web.lance_bovino.model.Leilao;
+import web.lance_bovino.filter.LeilaoBidHistoryFilter;
 import web.lance_bovino.model.LeilaoBidHistory;
-import web.lance_bovino.model.StatusLeilao;
 import web.lance_bovino.pagination.PaginacaoUtil;
 
 public class LeilaoBidHistoryQueriesImpl implements LeilaoBidHistoryQueries {
@@ -24,102 +21,125 @@ public class LeilaoBidHistoryQueriesImpl implements LeilaoBidHistoryQueries {
 	@PersistenceContext
 	private EntityManager em;
 
-   	public Page<Leilao> pesquisar(LeilaoFilter filtro, Pageable pageable, Long usuarioCodigo) {
+   	public Page<LeilaoBidHistory> pesquisar(LeilaoBidHistoryFilter filtro, Pageable pageable, Long usuarioCodigo) {
 
-		StringBuilder queryLeilao = new StringBuilder("select distinct l from Leilao l");
+		StringBuilder queryLeilaoBH = new StringBuilder("select distinct lbh from LeilaoBidHistory lbh");
 		StringBuilder condicoes = new StringBuilder();
 		Map<String, Object> parametros = new HashMap<>();
 
 		preencherCondicoesEParametros(filtro, condicoes, parametros);
 
 		if (condicoes.isEmpty()) {
-			condicoes.append(" where l.ativo = true and l.usuario.codigo = "+usuarioCodigo);
+			condicoes.append(" where lbh.usuario.codigo = "+usuarioCodigo);
 		} else {
-			condicoes.append(" and l.ativo = true and l.usuario.codigo = "+usuarioCodigo);
+			condicoes.append(" and lbh.usuario.codigo = "+usuarioCodigo);
 		}
 
-		queryLeilao.append(condicoes);
-		PaginacaoUtil.prepararOrdemJPQL(queryLeilao, "l", pageable);
-		TypedQuery<Leilao> typedQuery = em.createQuery(queryLeilao.toString(), Leilao.class);
+		String vencedorString = filtro.getVencedor();
+		if(vencedorString != null && !vencedorString.isBlank()){
+			if("Venceu".equalsIgnoreCase(vencedorString)){
+				condicoes.append(" AND lbh.leilao.vencedor.codigo = :codigoVencedor ");
+        		parametros.put("codigoVencedor", usuarioCodigo);
+			}	
+			if("Não venceu".equalsIgnoreCase(vencedorString)){
+				condicoes.append(" AND lbh.leilao.vencedor is null");
+			}
+		}
+
+		queryLeilaoBH.append(condicoes);
+		PaginacaoUtil.prepararOrdemJPQL(queryLeilaoBH, "lbh", pageable);
+		TypedQuery<LeilaoBidHistory> typedQuery = em.createQuery(queryLeilaoBH.toString(), LeilaoBidHistory.class);
 		PaginacaoUtil.prepararIntervalo(typedQuery, pageable);
 		PaginacaoUtil.preencherParametros(parametros, typedQuery);
-		List<Leilao> leiloes = typedQuery.getResultList();
+		List<LeilaoBidHistory> leiloes = typedQuery.getResultList();
 
-		long totalLeiloes = PaginacaoUtil.getTotalRegistros("Leilao", "l", condicoes, parametros, em);
+		long totalLeiloes = PaginacaoUtil.getTotalRegistros("LeilaoBidHistory", "lbh", condicoes, parametros, em);
 
 		return new PageImpl<>(leiloes, pageable, totalLeiloes);
 	}
 
-	private void preencherCondicoesEParametrosString(String filtro, StringBuilder condicoes,
-			Map<String, Object> parametros) {
-		if(filtro != null){
-			boolean condicao = false;
-			try {
-				Long codigo = Long.parseLong(filtro);
-				if (!condicao) {
-					condicoes.append(" where ");
-				} else {
-					condicoes.append(" or ");
-				}
-				condicoes.append("l.codigo = :codigo");
-				parametros.put("codigo", codigo);
-				condicao = true;
-			} catch (NumberFormatException e) {
-				if (!condicao) {
-					condicoes.append(" where ");
-				} else {
-					condicoes.append(" or ");
-				}
-				condicoes.append("lower(l.nome) like :nome");
-				parametros.put("nome", "%" + filtro.toLowerCase() + "%");
-				condicao = true;
-			}
-		}
-	}
+	// private void preencherCondicoesEParametrosString(String filtro, StringBuilder condicoes,
+	// 		Map<String, Object> parametros) {
+	// 	if(filtro != null){
+	// 		boolean condicao = false;
+	// 		try {
+	// 			Long codigo = Long.parseLong(filtro);
+	// 			if (!condicao) {
+	// 				condicoes.append(" where ");
+	// 			} else {
+	// 				condicoes.append(" or ");
+	// 			}
+	// 			condicoes.append("l.codigo = :codigo");
+	// 			parametros.put("codigo", codigo);
+	// 			condicao = true;
+	// 		} catch (NumberFormatException e) {
+	// 			if (!condicao) {
+	// 				condicoes.append(" where ");
+	// 			} else {
+	// 				condicoes.append(" or ");
+	// 			}
+	// 			condicoes.append("lower(l.nome) like :nome");
+	// 			parametros.put("nome", "%" + filtro.toLowerCase() + "%");
+	// 			condicao = true;
+	// 		}
+	// 	}
+	// }
 
-	private void preencherCondicoesEParametros(LeilaoFilter filtro, StringBuilder condicoes, Map<String, Object> parametros) {
+	private void preencherCondicoesEParametros(LeilaoBidHistoryFilter filtro, StringBuilder condicoes, Map<String, Object> parametros) {
 		boolean condicao = false;
 
 		if (filtro.getCodigo() != null) {
 			PaginacaoUtil.fazerLigacaoCondicoes(condicoes, condicao);
-			condicoes.append("l.codigo = :codigo");
+			condicoes.append(" lbh.codigo = :codigo ");
 			parametros.put("codigo", filtro.getCodigo());
 			condicao = true;
 		}
+		
 		if (StringUtils.hasText(filtro.getNome())) {
-			PaginacaoUtil.fazerLigacaoCondicoes(condicoes, condicao);		
-			condicoes.append("lower(l.nome) like :nome");
+			PaginacaoUtil.fazerLigacaoCondicoes(condicoes, condicao);       
+			condicoes.append(" lower(lbh.leilao.nome) like :nome ");
 			parametros.put("nome", "%" + filtro.getNome().toLowerCase() + "%");
 			condicao = true;
 		}
-		if (filtro.getInitialPrice() != null) {
+		
+		if (filtro.getLeilao() != null) {
 			PaginacaoUtil.fazerLigacaoCondicoes(condicoes, condicao);
-			condicoes.append("l.initialPrice = :initialPrice");
-			parametros.put("initialPrice", filtro.getInitialPrice());
+			condicoes.append(" lbh.leilao = :leilao ");
+			parametros.put("leilao", filtro.getLeilao());
 			condicao = true;
 		}
-
-		if (filtro.getFinalTimestamp() != null) {
-			PaginacaoUtil.fazerLigacaoCondicoes(condicoes, condicao);
-			condicoes.append("l.final_timestamp = :final_timestamp");
-			parametros.put("final_timestamp", filtro.getFinalTimestamp());
-			condicao = true;
-		}
-		if (filtro.getUsuario() != null) {
-			PaginacaoUtil.fazerLigacaoCondicoes(condicoes, condicao);
-			condicoes.append("l.usuario = :usuario");
-			parametros.put("usuario", filtro.getUsuario());
-			condicao = true;
-		}
+		
 		if (filtro.getGado() != null) {
 			PaginacaoUtil.fazerLigacaoCondicoes(condicoes, condicao);
-			condicoes.append("l.gado = :gado");
+			condicoes.append(" lbh.leilao.gado = :gado ");
 			parametros.put("gado", filtro.getGado());
 			condicao = true;
 		}
+
+		if (filtro.getUsuario() != null) {
+			PaginacaoUtil.fazerLigacaoCondicoes(condicoes, condicao);
+			condicoes.append(" lbh.usuario = :usuario ");
+			parametros.put("usuario", filtro.getUsuario());
+			condicao = true;
+		}
+		
+		if (filtro.getBidValue() != null) {
+			PaginacaoUtil.fazerLigacaoCondicoes(condicoes, condicao);
+			condicoes.append(" lbh.bidValue = :lance ");
+			parametros.put("lance", filtro.getBidValue());
+			condicao = true;
+		}
+		
+		if (filtro.getTimestampDeCriacao() != null) {
+			PaginacaoUtil.fazerLigacaoCondicoes(condicoes, condicao);
+			condicoes.append(" lbh.timestampDeCriacao = :criacao ");
+			parametros.put("criacao", filtro.getTimestampDeCriacao());
+			condicao = true;
+		}
+		
 		if (filtro.getStatus() != null) {
 			PaginacaoUtil.fazerLigacaoCondicoes(condicoes, condicao);
-			condicoes.append("l.status = :status");
+			condicoes.append(" lbh.leilao.status = :status ");
 			parametros.put("status", filtro.getStatus());
 			condicao = true;
 		}

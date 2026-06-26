@@ -4,9 +4,12 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import web.lance_bovino.filter.LeilaoBidHistoryFilter;
 import web.lance_bovino.model.LeilaoBidHistory;
 import web.lance_bovino.repository.LeilaoBidHistoryRepository;
 
@@ -49,6 +52,12 @@ public class LeilaoBidHistoryService {
     public List<LeilaoBidHistory> buscarTodosLancesUsuario(Long codigo) { 
         logger.info("Buscando todos os lances em leilaoBIdH do usuario: {}", codigo); 
         return leilaoBIdHRepository.findAllByUsuarioCodigo(codigo); 
+    }
+
+    @Transactional
+    public Page<LeilaoBidHistory> pesquisarUsuario(LeilaoBidHistoryFilter filtro, Pageable pageable, Long usuarioCodigo) {
+        logger.info("Pesquisando lances com o filtro {}", filtro);
+        return leilaoBIdHRepository.pesquisar(filtro, pageable, usuarioCodigo);
     }
 
 } 

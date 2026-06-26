@@ -16,7 +16,7 @@ public class LeilaoFilter {
     private Usuario usuario;
     private Gado gado;
     private StatusLeilao status;
-    private Usuario vencedor;
+    private String vencedor;
     public Long getCodigo() {
         return codigo;
     }
@@ -58,11 +58,11 @@ public class LeilaoFilter {
     }
     public void setStatus(StatusLeilao status) {
         this.status = status;
-    }
-    public Usuario getVencedor() {
+    }    
+    public String getVencedor() {
         return vencedor;
     }
-    public void setVencedor(Usuario vencedor) {
+    public void setVencedor(String vencedor) {
         this.vencedor = vencedor;
     }
     @Override

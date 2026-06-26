@@ -12,7 +12,7 @@
   <!-- conteudo principal -->
 <main layout:fragment="conteudo" th:fragment="formulario" id="main" class="flex flex-col align-middle w-full m-10">
 
-    <form th:hx-get="@{/leilao/pesquisarmeusleiloes}" class="w-1/2 mt-8 ms-16 space-y-4">
+    <form th:hx-get="@{/leilao/pesquisarmeuslances}" class="w-1/2 mt-8 ms-16 space-y-4">
           
           <div th:replace="~{components/forms :: inputTexto(
             textoLabel='Nome', 

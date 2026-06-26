@@ -1,6 +1,5 @@
 package web.lance_bovino.controller;
 
-import java.io.ObjectInputFilter.Status;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -30,6 +29,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import web.lance_bovino.dto.LeilaoDTOInput;
+import web.lance_bovino.filter.LeilaoBidHistoryFilter;
 import web.lance_bovino.filter.LeilaoFilter;
 import web.lance_bovino.model.Gado;
 import web.lance_bovino.model.Leilao;
@@ -128,14 +128,14 @@ public class LeilaoController {
     }
 
     @GetMapping("/pesquisarmeuslances")
-    public String pesquisarMeusLances(LeilaoFilter filtro, Model model,
+    public String pesquisarMeusLances(LeilaoBidHistoryFilter filtro, Model model,
             @PageableDefault(size = 9) @SortDefault(sort = "codigo",
                     direction = Sort.Direction.ASC) Pageable pageable,
             HttpServletRequest request,@AuthenticationPrincipal UserDetails userDetails) {
 		Long usuarioCodigo = usuarioRepository.findByNome(userDetails.getUsername()).getCodigo();
-        Page<Leilao> pagina = leilaoService.pesquisarUsuario(filtro, pageable, usuarioCodigo);
-        logger.info("Leiloes do usuario {} pesquisados: {}", userDetails.getUsername(), pagina.getContent());
-        PageWrapper<Leilao> paginaWrapper = new PageWrapper<>(pagina, request);
+        Page<LeilaoBidHistory> pagina = leilaoBidHistoryService.pesquisarUsuario(filtro, pageable, usuarioCodigo);
+        logger.info("Lances do usuario {} pesquisados: {}", userDetails.getUsername(), pagina.getContent());
+        PageWrapper<LeilaoBidHistory> paginaWrapper = new PageWrapper<>(pagina, request);
         model.addAttribute("pagina", paginaWrapper);
 		model.addAttribute("status",StatusLeilao.values());
         return "leilao/mostrar_meus_lances :: tabela";
