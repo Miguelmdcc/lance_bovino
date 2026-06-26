@@ -12,7 +12,7 @@ CREATE TABLE public.gado
     CONSTRAINT fk_gado_usuario FOREIGN KEY (codigo_usuario) REFERENCES public.usuario(codigo)
 );
 
-INSERT INTO gado (nome, peso, raca, altura, idade, codigo_usuario) VALUES
-('gado1', 100.0, 'zebu', 100.0, 10, 1),
-('gado2', 100.0, 'nelore', 100.0, 10, 2),
-('gado3', 100.0, 'zebu', 100.0, 10, 3);
+-- INSERT INTO gado (nome, peso, raca, altura, idade, codigo_usuario) VALUES
+-- ('gado1', 100.0, 'zebu', 100.0, 10, 1),
+-- ('gado2', 100.0, 'nelore', 100.0, 10, 2),
+-- ('gado3', 100.0, 'zebu', 100.0, 10, 3);
