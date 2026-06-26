@@ -41,8 +41,14 @@ public class LeilaoBidHistoryService {
 
     @Transactional(readOnly = true)
     public LeilaoBidHistory buscarUltimoLance(Long codigo) { 
-        logger.info("Removendo leilaoBIdH com código: {}", codigo); 
+        logger.info("Buscando ultimo lance em leilaoBIdH com código: {}", codigo); 
         return leilaoBIdHRepository.buscarUltimoLance(codigo); 
+    }
+
+    @Transactional(readOnly = true)
+    public List<LeilaoBidHistory> buscarTodosLancesUsuario(Long codigo) { 
+        logger.info("Buscando todos os lances em leilaoBIdH do usuario: {}", codigo); 
+        return leilaoBIdHRepository.findAllByUsuarioCodigo(codigo); 
     }
 
 } 

@@ -1,7 +1,11 @@
 package web.lance_bovino.controller;
 
+import java.io.ObjectInputFilter.Status;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,6 +111,36 @@ public class LeilaoController {
         return "leilao/mostrar :: tabela";
     }
 
+    @GetMapping("/abrirpesquisarmeuslances")
+    public String abrirPesquisaMeusLances(Model model, @AuthenticationPrincipal UserDetails userDetails) {
+        List<String> venceuounaoList = new ArrayList<>();
+        venceuounaoList.add("Venceu");
+        venceuounaoList.add("Não venceu");
+        model.addAttribute("venceuounao",venceuounaoList);
+        List<StatusLeilao> statuses = new ArrayList<>();
+        for(StatusLeilao status: StatusLeilao.values()){
+            if(status != StatusLeilao.AGUARDANDO){
+                statuses.add(status);
+            }
+        }
+		model.addAttribute("statuses",statuses);
+        return "leilao/pesquisar_meus_lances :: formulario";
+    }
+
+    @GetMapping("/pesquisarmeuslances")
+    public String pesquisarMeusLances(LeilaoFilter filtro, Model model,
+            @PageableDefault(size = 9) @SortDefault(sort = "codigo",
+                    direction = Sort.Direction.ASC) Pageable pageable,
+            HttpServletRequest request,@AuthenticationPrincipal UserDetails userDetails) {
+		Long usuarioCodigo = usuarioRepository.findByNome(userDetails.getUsername()).getCodigo();
+        Page<Leilao> pagina = leilaoService.pesquisarUsuario(filtro, pageable, usuarioCodigo);
+        logger.info("Leiloes do usuario {} pesquisados: {}", userDetails.getUsername(), pagina.getContent());
+        PageWrapper<Leilao> paginaWrapper = new PageWrapper<>(pagina, request);
+        model.addAttribute("pagina", paginaWrapper);
+		model.addAttribute("status",StatusLeilao.values());
+        return "leilao/mostrar_meus_lances :: tabela";
+    }
+
 	@GetMapping("/cadastrar")
 	public String abrirCadastroLeilao(LeilaoDTOInput leilao, Model model) {
 		return "leilao/cadastrar :: formulario";
@@ -125,6 +159,22 @@ public class LeilaoController {
     public String pesquisarGadoCadastrar(String gadoBusca, Model model,@AuthenticationPrincipal UserDetails userDetails) {
 		Long codigo_usuario = usuarioRepository.findByNome(userDetails.getUsername()).getCodigo();
         List<Gado> gados = gadoService.pesquisarGeral(gadoBusca, codigo_usuario);
+        logger.debug("Gados buscados: {}", gados);
+        model.addAttribute("gados", gados);
+        return "gado/listar :: lista";
+    }
+
+    @GetMapping("/pesquisargadolances")
+    public String pesquisarGadoLances(Model model,@AuthenticationPrincipal UserDetails userDetails) {
+		Long codigo_usuario = usuarioRepository.findByNome(userDetails.getUsername()).getCodigo();
+        List<LeilaoBidHistory> leilaoBidHistoryList = leilaoBidHistoryService.buscarTodosLancesUsuario(codigo_usuario);
+        Set<Gado> gadosSet = new HashSet<>();
+        for(LeilaoBidHistory lance: leilaoBidHistoryList){
+            if(lance.getLeilao() != null && lance.getLeilao().getGado() != null){
+                gadosSet.add(lance.getLeilao().getGado());
+            }
+        }
+        List<Gado> gados = new ArrayList<>(gadosSet);
         logger.debug("Gados buscados: {}", gados);
         model.addAttribute("gados", gados);
         return "gado/listar :: lista";
